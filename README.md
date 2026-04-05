@@ -90,7 +90,7 @@ The player interacts with **Odyssey OS**, a system housing encrypted data of his
 
 ## Technologies Used
 
-- **C++** for core game logic and terminal-based UI.
+- **C++ 11** for core game logic and terminal-based UI.
 - **ASCII Art** for the retro terminal aesthetic.
 - **ANSI Escape Codes** for color and text effects.
 - **Standard libraries:** `<iostream>`, `<unistd.h>` for delays, and `usleep()` for animations.
