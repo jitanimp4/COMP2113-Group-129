@@ -1,6 +1,24 @@
 # COMP2113-Group-129
 # Odyssey OS: The Heritage Terminal
 
+Group Members: 
+1. Menaka Kalpally Pulapra Menon
+2. Anushka Jitani
+3. Krislyn Mariah Mendonca
+4. Anshika Mittal
+5. Arpita Sharma
+6. Miracle Ukazu Oluebube
+
+Contributions: 
+
+App 1: Menaka Kalpally Pulapra Menon
+App 2: Anushka Jitani
+App 3: Krislyn Mariah Mendonca
+App 4: Anshika Mittal
+App 5: Arpita Sharma
+App 6: Miracle Ukazu Oluebube
+
+
 Overview:
 
 Odyssey OS: The Heritage Terminal is a vintage-style interactive terminal game that simulates an old-school computer system. The player logs into "Odyssey OS," a simulated classified database, to decrypt corrupted files related to world heritage sites, history, art, and architecture. The player will need to complete various mini-games, each focused on different themes like ancient civilizations, movies, art history, and more.
@@ -16,7 +34,7 @@ Odyssey OS: The Heritage Terminal is a vintage-style interactive terminal game t
   - [App 6: The Forger's Table](#app-6-the-forgers-table)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
-- [Contributing](#contributing)
+  
 
 ## Game Concept
 
