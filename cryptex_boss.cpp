@@ -48,6 +48,7 @@ vector<TriviaQuestion> loadQuestions(string filename, string mode)
     return questions;
 }
 
+//Changed Shuffle logic, this was too simple and not efficient
 //void shuffleQuestions(vector<TriviaQuestion>& questions)
 //{
 //for (int i = 0; i < questions.size(); i++)
