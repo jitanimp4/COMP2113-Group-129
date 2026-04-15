@@ -11,6 +11,7 @@ struct TriviaQuestion
     string question;
     string answer;
     string hint;
+    bool bonusLife;
 };
 
 void runCryptexBoss(string mode);
