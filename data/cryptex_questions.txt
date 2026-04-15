@@ -1,0 +1,8 @@
+easy|Which civilization built the pyramids of Giza?|Egyptians|They lived in ancient northeast Africa
+easy|Who is the Greek god of the sea?|Poseidon|He carries a trident
+easy|Where did spongebob live?|Bikini Bottom|Fishland named after swimwear
+easy|What is the original color of Smurfette from the famous Smurf movie?|Grey|Color of ashes
+medium|What famous amphitheater is in Rome?|Colosseum|Gladiators fought there
+medium|Which abandoned island is known as Battleship Island?|Hashima Island|It is in Japan
+hard|What ancient wonder stretched across northern China?|Great Wall|It was built for defense
+hard|Which civilization is associated with Machu Picchu?|Inca|South American empire
