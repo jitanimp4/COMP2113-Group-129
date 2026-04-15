@@ -67,7 +67,7 @@ void countdown()
     for (int i = 3; i >= 1; i--)
     {
         cout << RED << BOLD << i << RESET << endl;
-        this_thread::sleep_for(chrono::milliseconds(700));
+        this_thread::sleep_for(chrono::milliseconds(900));
     }
     cout << RED << BOLD << "BEGIN!" << RESET << endl;
 }
@@ -185,7 +185,7 @@ void showMascotAngry()
 {
     cout << "   /\\_/\\\\ " << endl;
     cout << "  ( >.< )" << endl;
-    cout << "   > ^ <   CURIO IS NOT PLEASED." << endl;
+    cout << "   > ^ <  " << RED << "CURIO IS NOT PLEASED." << RESET << endl;
 }
 
 void showMascotSad()
@@ -194,7 +194,8 @@ void showMascotSad()
     cout << BRIGHT_YELLOW;
     cout << "   /\\_/\\ " << endl;
     cout << "  ( T_T )" << endl;
-    cout << "   > ^ <   "<< RED <<"YOU FAILED CURIO *TSK *TSK..." << RESET << endl;
+    cout << "   > ^ <   " << RESET;
+    typeTextColor("YOU FAILED CURIO *TSK *TSK", 70, RED);
     cout << "============================================" << endl;
 }
 
@@ -205,7 +206,7 @@ void showMascotHappy()
     cout << "   /\\_/\\ " << endl;
     cout << "  ( ^w^ )" << endl;
     cout << "   > ^ <  " << GREEN << "ARCHIVE RESTORED!" << RESET << endl;
-    cout << "Curio is very happy! UwU" << endl;
+    typeTextColor("Curio is happy with you UwU", 60, BOLD);
     cout << "============================================" << endl;
 }
 
@@ -221,7 +222,8 @@ void showMascotThinking()
     cout << BRIGHT_CYAN;
     cout << "   /\\_/\\\\ " << endl;
     cout << "  ( o~o )" << endl;
-    cout << "   > ^ <   "<< RESET << "Curio is searching the archives..." << endl;
+    cout << "   > ^ <   "<< RESET;
+    typeTextColor("Curio is searching the archives...", 60, BOLD);
 }
 
 void showMascotGlitch()
@@ -255,9 +257,10 @@ void runCryptexBoss(string mode)
         cout << "No questions found for this mode." << endl;
         return;
     }
-    srand(time(0)); //put this in main
+    //srand(time(0)); //put this in main
     shuffleQuestions(questions);
     bootSequence();
+    this_thread::sleep_for(chrono::milliseconds(500));
     time_t startTime = time(0);
     int timeLimit = 60; // seconds
 
@@ -269,19 +272,19 @@ void runCryptexBoss(string mode)
     if (mode == "easy")
     {
         lives = 5;
-        timeLimit = 111;
+        timeLimit = 107;
         hintsLeft = 3;
     }
     else if (mode == "medium")
     {
         lives = 3;
-        timeLimit = 91;
+        timeLimit = 87;
         hintsLeft = 2;
     }
     else
     {
         lives = 2;
-        timeLimit = 66;
+        timeLimit = 63;
         hintsLeft = 1;
     }
 
@@ -289,7 +292,7 @@ void runCryptexBoss(string mode)
     {
         totalQuestions = questions.size();
     }
-    
+
     showMascotSleeping();
     typeTextColor("Waking Curio...", 60, BRIGHT_CYAN);
     cout<<endl;
@@ -459,7 +462,7 @@ void runCryptexBoss(string mode)
     {
         showMascotHappy();
         flashWarning("You survived the Cryptex!", GREEN, RESET, 3);
-        // << GREEN << "You survived the Cryptex!" << endl;
+        // cout<< GREEN << "You survived the Cryptex!" << endl;
     }
     else
     {
