@@ -100,7 +100,7 @@ string toLowerCase(string text)
 {
     for (int i = 0; i < text.length(); i++)
     {
-        text[i] = tolower(text[i]);
+        text[i] = tolower((unsigned char)text[i]);
     }
     return text;
 }
