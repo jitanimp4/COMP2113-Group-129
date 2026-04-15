@@ -1,7 +1,3 @@
-// TimeSlipSyndicate.cpp
-// The Time-Slip Syndicate - An Architectural Wordle Game
-// ENGG1340/COMP2113 Project
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -28,9 +24,7 @@
 using namespace std;
 using namespace chrono;
 
-// ================================
 // Constants and Enumerations
-// ================================
 
 enum Difficulty { EASY, MEDIUM, HARD };
 enum CellState { EMPTY, CORRECT, MISPLACED, WRONG };
@@ -41,6 +35,7 @@ struct Cell {
 };
 
 // Word banks for different difficulty levels
+
 const vector<string> EASY_WORDS = {
     "RUINS", "MAYA", "ARCH", "DOME", "WALL", 
     "TOWER", "TEMPLE", "STONE", "BRICK", "PILLAR"
@@ -56,9 +51,7 @@ const vector<string> HARD_WORDS = {
     "DORIC", "IONIC", "CORIN", "CARYA", "ROSET"
 };
 
-// ================================
-// Console Color Class (Cross-platform)
-// ================================
+// Console Color Class 
 
 class ConsoleColor {
 private:
@@ -89,9 +82,7 @@ public:
     }
 };
 
-// ================================
 // Timer Class
-// ================================
 
 class Timer {
 private:
@@ -126,9 +117,7 @@ public:
     }
 };
 
-// ================================
 // Game Class
-// ================================
 
 class TimeSlipSyndicate {
 private:
@@ -146,6 +135,7 @@ private:
     ConsoleColor console;
     
     // Immersive messages for feedback
+
     const vector<string> successMessages = {
         "✓ Temporal fragment recovered!",
         "✓ Historical resonance detected!",
@@ -204,7 +194,7 @@ public:
         guessTimer.start(timeLimit);
     }
     
-    // Clear screen (cross-platform)
+    // Clear screen 
     void clearScreen() {
         cout << "\033[2J\033[1;1H";
     }
