@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <cctype>
+#include <thread> //for my animations
+#include <chrono> //for my animations
 using namespace std;
 
 //Color scheme
@@ -22,9 +24,78 @@ const string BRIGHT_RED   = "\033[91m";
 const string BRIGHT_GREEN = "\033[92m";
 const string BRIGHT_YELLOW= "\033[93m";
 const string BRIGHT_CYAN  = "\033[96m";
-
 const string BOLD   = "\033[1m";
 
+
+// animations
+void typeTextColor(string text, int delayMs, string color)
+{
+    cout << color;
+
+    for (int i = 0; i < text.length(); i++)
+    {
+        cout << text[i] << flush;
+        this_thread::sleep_for(chrono::milliseconds(delayMs));
+    }
+
+    cout << RESET << endl;
+}
+
+void loadingDots(string text, int steps, int delayMs)
+{
+    for (int i = 0; i < steps; i++)
+    {
+        int dots = i % 4;  // cycles 0,1,2,3
+
+        cout << "\r" << text;
+
+        for (int j = 0; j < dots; j++)
+        {
+            cout << ".";
+        }
+
+        cout << "   " << flush; // clears leftover dots
+
+        this_thread::sleep_for(chrono::milliseconds(delayMs));
+    }
+
+    cout << "\r" << text << "..." << endl;
+}
+
+void countdown()
+{
+    for (int i = 3; i >= 1; i--)
+    {
+        cout << RED << BOLD << i << RESET << endl;
+        this_thread::sleep_for(chrono::milliseconds(700));
+    }
+    cout << RED << BOLD << "BEGIN!" << RESET << endl;
+}
+
+void flashWarning(string text, string color, string reset, int times)
+{
+    for (int i = 0; i < times; i++)
+    {
+        cout << color << text << reset << "\r" << flush;
+        this_thread::sleep_for(chrono::milliseconds(250));
+        cout << string(text.length(), ' ') << "\r" << flush;
+        this_thread::sleep_for(chrono::milliseconds(250));
+    }
+    cout << color << text << reset << endl;
+}
+
+void bootSequence()
+{
+    typeTextColor("Odyssey OS v1.0", 40, BOLD);
+    typeTextColor("Initializing archive core...", 35, BOLD);
+    cout << MAGENTA;
+    typeTextColor("Turning off the Oven...", 35, BOLD);
+    cout << RESET;
+    typeTextColor("Decrypting heritage records...", 35, BOLD);
+    flashWarning("Access granted!", GREEN, RESET, 3);
+}
+
+//Change to lowercase
 string toLowerCase(string text)
 {
     for (int i = 0; i < text.length(); i++)
@@ -159,14 +230,25 @@ void showMascotGlitch()
     cout << RED;
     cout << "   /\\\\_/\\\\ " << endl;
     cout << "  ( x.x )" << endl;
-    cout << "   > ^ <   CURI0_//GL1TCH DETECTED" << endl;
+    cout << "   > ^ <   ";
+    typeTextColor("CURI0_//GL1TCH DETECTED", 60, RED);
     cout << RESET;
     cout << "============================================" << endl;
 }
 
+void showMascotAnimated()
+{
+    cout << PINK << "   /\\_/\\\\ " << endl;
+    this_thread::sleep_for(chrono::milliseconds(120));
+    cout << "  ( o.o )" << endl;
+    this_thread::sleep_for(chrono::milliseconds(120));
+    cout << "   > ^ <   Curio is watching..." << endl;
+    cout << RESET;
+}
+
 void runCryptexBoss(string mode)
 {
-    vector<TriviaQuestion> questions = loadQuestions("data/cryptex_questions.txt", mode); //is cryptex_questions in my codeblocks
+    vector<TriviaQuestion> questions = loadQuestions("data/cryptex_questions.txt", mode);
 
     if (questions.size() == 0)
     {
@@ -186,19 +268,19 @@ void runCryptexBoss(string mode)
     if (mode == "easy")
     {
         lives = 5;
-        timeLimit = 100;
+        timeLimit = 111;
         hintsLeft = 3;
     }
     else if (mode == "medium")
     {
         lives = 3;
-        timeLimit = 80;
+        timeLimit = 91;
         hintsLeft = 2;
     }
     else
     {
         lives = 2;
-        timeLimit = 50;
+        timeLimit = 66;
         hintsLeft = 1;
     }
 
@@ -206,28 +288,35 @@ void runCryptexBoss(string mode)
     {
         totalQuestions = questions.size();
     }
-
+    bootSequence();
     showMascotSleeping();
-    cout << BRIGHT_CYAN << "Waking Curio..." << RESET << endl;
+    typeTextColor("Waking Curio...", 60, BRIGHT_CYAN);
     cout<<endl;
     cout << "==================================" << endl;
     cout << "     THE CURATOR'S CRYPTEX        " << endl;
     cout << "==================================" << endl;
     cout<<endl;
-    showMascotNormal();
-    cout << CYAN << "[ARCHIVE STATUS] Final archive access initiated..." << RESET << endl;
+    showMascotAnimated();
+    cout << BRIGHT_CYAN;
+    loadingDots("Decrypting archive", 12, 250);
+    cout << RESET;
+    typeTextColor("[ARCHIVE STATUS] Final archive access initiated...", 40, CYAN);
+
     //Color Change Modes
     if (mode == "easy")
     {
-        cout << "Mode: " << GREEN << mode << RESET << endl;
+        cout << "Mode: ";
+        typeTextColor(mode, 40, GREEN);
     }
     else if (mode == "medium")
     {
-        cout << "Mode: " << YELLOW << mode << RESET << endl;
+        cout << "Mode: ";
+        typeTextColor(mode, 40, YELLOW);
     }
     else
     {
-        cout << "Mode: " << RED << mode << RESET << endl;
+        cout << "Mode: ";
+        typeTextColor(mode, 40, RED);
     }
     if (lives == 1)
     {
@@ -242,15 +331,18 @@ void runCryptexBoss(string mode)
 
     if (mode == "hard")
     {
-        cout << BRIGHT_RED << BOLD;
-        cout << "==================================" << endl;
-        cout << "        SUDDEN DEATH MODE         " << endl;
-        cout << "==================================" << RESET << endl;
+        //cout << BRIGHT_RED << BOLD;
+        cout << endl;
+        //cout << "==================================" << endl;
+        flashWarning("SUDDEN DEATH MODE SELECTED!", RED, RESET, 3);
+        //cout << "==================================" << RESET << endl;
 
         cout << RED << "[SECURITY NOTICE]" << RESET
              << " Errors will not be forgiven." << endl;
+        //typeTextColor("Errors will not be FORGIVEN", 40, RED);
 
         showMascotGlitch();
+        countdown();
     }
 
     for (int i = 0; i < totalQuestions && lives > 0; i++)
@@ -259,7 +351,7 @@ void runCryptexBoss(string mode)
 
         if (now - startTime >= timeLimit)
         {
-            cout << "[SYSTEM FAILURE] Time is UP!" << endl;
+            cout << "[SYSTEM TIME BREACHED] Time is UP!" << endl;
             showMascotSad();
             break;
         }
@@ -291,7 +383,7 @@ void runCryptexBoss(string mode)
         time_t afterAnswer = time(0);
         if (afterAnswer - startTime >= timeLimit)
         {
-            cout << RED << "[SYSTEM FAILURE] Time is UP!" << RESET << endl;
+            cout << RED << "[SYSTEM TIME BREACHED] Time is UP!" << RESET << endl;
             break;
         }
 
@@ -329,7 +421,7 @@ void runCryptexBoss(string mode)
             {
                 lives++;
                 cout << endl;
-                cout << MAGENTA << "[RELIC BONUS] Extra life granted." << RESET << endl;
+                flashWarning("[RELIC BONUS] Extra life granted.", MAGENTA, RESET, 3);
             }
         }
         else
@@ -337,14 +429,13 @@ void runCryptexBoss(string mode)
             lives--;
             if (lives == 1)
             {
-                cout << RED << BOLD << "============================================" << endl;
-                cout << "       WARNING: Final life remaining!       " << endl;
-                cout << "============================================" << RESET << endl;
+                //cout << RED << BOLD << "============================================" << endl;
+                flashWarning("WARNING: Final life remaining!", RED, RESET, 3);
+                //cout << "============================================" << RESET << endl;
                 showMascotAngry();
             }
-            cout << RED << endl;
-            cout << "[ARCHIVE BREACH!!!] Incorrect response." << endl;
-            cout << RESET << endl;
+            cout << endl;
+            flashWarning("[ARCHIVE BREACH!!!] Incorrect response.", RED, RESET, 3);
             cout << "Correct answer: " << questions[i].answer << endl;
             if (lives == 1)
             {
@@ -366,11 +457,13 @@ void runCryptexBoss(string mode)
     if (lives > 0)
     {
         showMascotHappy();
-        cout << GREEN << "You survived the Cryptex!" << endl;
+        flashWarning("You survived the Cryptex!", GREEN, RESET, 3);
+        // << GREEN << "You survived the Cryptex!" << endl;
     }
     else
     {
         showMascotSad();
+        flashWarning("The Cryptex defeated you!", RED, RESET, 3);
         cout << "The Cryptex defeated you." << endl;
     }
 }
