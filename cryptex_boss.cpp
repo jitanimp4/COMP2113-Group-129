@@ -257,6 +257,7 @@ void runCryptexBoss(string mode)
     }
     srand(time(0)); //put this in main
     shuffleQuestions(questions);
+    bootSequence();
     time_t startTime = time(0);
     int timeLimit = 60; // seconds
 
@@ -288,7 +289,7 @@ void runCryptexBoss(string mode)
     {
         totalQuestions = questions.size();
     }
-    bootSequence();
+    
     showMascotSleeping();
     typeTextColor("Waking Curio...", 60, BRIGHT_CYAN);
     cout<<endl;
