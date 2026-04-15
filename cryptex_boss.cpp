@@ -88,7 +88,7 @@ void bootSequence()
 {
     typeTextColor("Odyssey OS v1.0", 40, BOLD);
     typeTextColor("Initializing archive core...", 35, BOLD);
-    cout << MAGENTA;
+    cout << BRIGHT_CYAN;
     typeTextColor("Turning off the Oven...", 35, BOLD);
     cout << RESET;
     typeTextColor("Decrypting heritage records...", 35, BOLD);
