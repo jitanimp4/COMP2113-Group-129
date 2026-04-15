@@ -464,6 +464,6 @@ void runCryptexBoss(string mode)
     {
         showMascotSad();
         flashWarning("The Cryptex defeated you!", RED, RESET, 3);
-        cout << "The Cryptex defeated you." << endl;
+        //cout << "The Cryptex defeated you." << endl;
     }
 }
