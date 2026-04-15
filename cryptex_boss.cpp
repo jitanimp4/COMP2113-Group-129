@@ -186,13 +186,13 @@ void runCryptexBoss(string mode)
     if (mode == "easy")
     {
         lives = 5;
-        timeLimit = 120;
+        timeLimit = 100;
         hintsLeft = 3;
     }
     else if (mode == "medium")
     {
         lives = 3;
-        timeLimit = 90;
+        timeLimit = 80;
         hintsLeft = 2;
     }
     else
