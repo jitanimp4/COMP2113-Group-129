@@ -29,9 +29,9 @@ Odyssey OS: The Heritage Terminal is a vintage-style interactive terminal game t
   - [App 1: Word Pyramids of Giza](#app-1-word-pyramids-of-giza)
   - [App 2: The Director's Archive](#app-2-the-directors-archive)
   - [App 3: The Time-Slip Syndicate](#app-3-the-time-slip-syndicate)
-  - [App 4: The Curator's Cryptex](#app-4-the-curators-cryptex)
-  - [App 5: Crossword](#app-5-crossword)
-  - [App 6: The Forger's Table](#app-6-the-forgers-table)
+  - [App 4: Crossword](#app-5-crossword)
+  - [App 5: The Forger's Table](#app-6-the-forgers-table)
+  - [App 6: The Curator's Cryptex](#app-4-the-curators-cryptex)]
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
   
