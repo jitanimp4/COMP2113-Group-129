@@ -152,7 +152,7 @@ private:
     
 public:
     // Constructor
-    TimeSlipSyndicate(Diff diff) : 
+    TimeSlipSyndicate(Difficulty diff) : 
         currentRow(0), 
         currentCol(0), 
         gameWon(false), 
