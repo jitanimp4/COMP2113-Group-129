@@ -7,14 +7,13 @@
 using namespace std;
 
 // --- FORWARD DECLARATIONS ---
-// This tells the compiler your mini-games exist in the other folders
+// This connects the root menu to the mini-games in your folders
 void runForgersTable();
-// Uncomment these below as you fix the main() functions in your other files!
-// void runDirectorsArchive(); 
-// void runCrossword();
-// void runWordPyramid();
-// void runWordle();
-// void runCryptexBoss();
+void runDirectorsArchive(); 
+void runCrossword();
+void runWordPyramid();
+void runWordle();
+void runCryptexBoss();
 
 int main() {
     bool systemRunning = true;
@@ -42,20 +41,15 @@ int main() {
         if (choice == 1) {
             runForgersTable(); 
         } else if (choice == 2) {
-            cout << "Loading The Director's Archive...\n";
-            // runDirectorsArchive(); 
+            runDirectorsArchive(); 
         } else if (choice == 3) {
-            cout << "Loading Crossword...\n";
-            // runCrossword();
+            runCrossword();
         } else if (choice == 4) {
-            cout << "Loading Word Pyramids...\n";
-            // runWordPyramid();
+            runWordPyramid();
         } else if (choice == 5) {
-            cout << "Loading Architect's Wordle...\n";
-            // runWordle();
+            runWordle();
         } else if (choice == 6) {
-            cout << "Loading The Curator's Cryptex...\n";
-            // runCryptexBoss();
+            runCryptexBoss();
         } else if (choice == 7) {
             cout << "Logging off...\n";
             systemRunning = false;
