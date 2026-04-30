@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-int main() {
+int runCrosswordApp() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
 
