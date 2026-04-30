@@ -44,7 +44,7 @@ bool WordPyramidGame::loadWordBank(const std::string& fileName, std::vector<std:
  // Checks whether a puzzle candidate satisfies assignment constraints.
 
 bool WordPyramidGame::validatePuzzleConstraints(const std::vector<std::string>& words) const {
-  if (words.size() < 4 || words.size() > 7) {
+  if (words.size() < 4 || words.size() > 6) {
     return false;
   }
 
@@ -52,7 +52,7 @@ bool WordPyramidGame::validatePuzzleConstraints(const std::vector<std::string>& 
   for (size_t i = 0; i < words.size(); ++i) {
     totalChars += static_cast<int>(words[i].size());
   }
-  return totalChars >= 40 && totalChars <= 60;
+  return totalChars >= 35 && totalChars <= 55;
 }
 
 
@@ -491,6 +491,21 @@ void WordPyramidGame::printPyramid() const {
 // Displays all round UI details before asking for next input.
 
 void WordPyramidGame::displayGameState() const {
+  std::cout<< "\n--------------------------------------------------\n";
+  switch (wordsiculty){
+    case 1:
+      std::cout<<"Category: Gods, Monsters, and Myths (Greek, Roman, Egyptian, Hindu, Nordic)\n";
+      break;
+    case 2:
+      std::cout<<"Category: Empires, Innovation, Monuments\n";
+      break;
+    case 3:
+      std::cout<<"Category: Rulers, Pharaohs, and Heros (Greek, Roman, Egyptian, Nordic)\n";
+      break;
+    default:
+      std::cout<<"Category: Unknown\n";
+  std::cout << "Number of words to find: " << activePuzzle->hintsRemaining << "\n";
+  std::cout << "--------------------------------------------------\n";   
   printPyramid();
   printGuessedWords();
   std::cout << "Hints remaining: " << activePuzzle->hintsRemaining << "\n";
