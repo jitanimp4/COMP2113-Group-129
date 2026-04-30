@@ -10,7 +10,7 @@ using namespace std;
  * Return value:
  * - 0 on normal termination.
  */
-int main(int argc, char* argv[]) {
+int  runWordPyramidApp(int argc, char* argv[]) {
   (void)argc;
   (void)argv;
   runWordPyramidGame();
