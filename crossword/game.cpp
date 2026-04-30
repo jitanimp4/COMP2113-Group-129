@@ -292,7 +292,7 @@ CrosswordGame::CrosswordGame(const std::string &savePath)
 
 void CrosswordGame::run() {
     printScrollIntro();
-    std::cout << "App 5: Crossword (Anshika)\n";
+    std::cout << "Crossword\n";
     if (!tryLoadGame()) {
         if (!startNewGame()) return;
     }
@@ -329,7 +329,7 @@ bool CrosswordGame::tryLoadGame() {
 }
 
 bool CrosswordGame::startNewGame() {
-    std::cout << "Choose Level:\n";
+    std::cout << "Choose Level (1/2/3):\n";
     std::cout << "  1) Easy\n";
     std::cout << "  2) Medium\n";
     std::cout << "  3) Hard\n";
