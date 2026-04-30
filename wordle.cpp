@@ -1,3 +1,7 @@
+// TimeSlipSyndicate.cpp
+// The Time-Slip Syndicate - An Architectural Wordle Game
+// ENGG1340/COMP2113 Project
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,7 +14,6 @@
 #include <cctype>
 #include <iomanip>
 #include <fstream>
-#include <random>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -24,7 +27,9 @@
 using namespace std;
 using namespace chrono;
 
+// ================================
 // Constants and Enumerations
+// ================================
 
 enum Difficulty { EASY, MEDIUM, HARD };
 enum CellState { EMPTY, CORRECT, MISPLACED, WRONG };
@@ -35,7 +40,6 @@ struct Cell {
 };
 
 // Word banks for different difficulty levels
-
 const vector<string> EASY_WORDS = {
     "RUINS", "MAYA", "ARCH", "DOME", "WALL", 
     "TOWER", "TEMPLE", "STONE", "BRICK", "PILLAR"
@@ -51,7 +55,9 @@ const vector<string> HARD_WORDS = {
     "DORIC", "IONIC", "CORIN", "CARYA", "ROSET"
 };
 
-// Console Color Class 
+// ================================
+// Console Color Class (Cross-platform)
+// ================================
 
 class ConsoleColor {
 private:
@@ -82,7 +88,9 @@ public:
     }
 };
 
+// ================================
 // Timer Class
+// ================================
 
 class Timer {
 private:
@@ -117,14 +125,15 @@ public:
     }
 };
 
+// ================================
 // Game Class
+// ================================
 
 class TimeSlipSyndicate {
 private:
     string targetWord;
     vector<vector<Cell>> grid;
     int currentRow;
-    int currentCol;
     bool gameWon;
     bool gameActive;
     Difficulty difficulty;
@@ -135,26 +144,24 @@ private:
     ConsoleColor console;
     
     // Immersive messages for feedback
-
     const vector<string> successMessages = {
-        "✓ Temporal fragment recovered!",
-        "✓ Historical resonance detected!",
-        "✓ Timeline stabilized!",
-        "✓ Artifact successfully decoded!"
+        "Temporal fragment recovered!",
+        "Historical resonance detected!",
+        "Timeline stabilized!",
+        "Artifact successfully decoded!"
     };
     
     const vector<string> failureMessages = {
-        "✗ Temporal anomaly detected!",
-        "✗ Historical fragment corrupted!",
-        "✗ Timeline divergence imminent!",
-        "✗ Artifact mismatch confirmed!"
+        "Temporal anomaly detected!",
+        "Historical fragment corrupted!",
+        "Timeline divergence imminent!",
+        "Artifact mismatch confirmed!"
     };
     
 public:
     // Constructor
-    TimeSlipSyndicate(Difficulty diff) : 
+    TimeSlipSyndicate(Diff diff) : 
         currentRow(0), 
-        currentCol(0), 
         gameWon(false), 
         gameActive(true),
         difficulty(diff) {
@@ -194,14 +201,14 @@ public:
         guessTimer.start(timeLimit);
     }
     
-    // Clear screen 
+    // Clear screen (cross-platform)
     void clearScreen() {
         cout << "\033[2J\033[1;1H";
     }
     
     // Draw the top border
     void drawTopBorder() {
-        console.setColor(36); // Cyan
+        console.setColor(36);
         cout << "╔════════════════════════════════════════════════════════════════════════════════╗\n";
         console.reset();
     }
@@ -218,10 +225,10 @@ public:
         console.setColor(36);
         cout << "║  [TEMPORAL ARCHIVE v2.47]";
         
-        console.setColor(32); // Green
+        console.setColor(32);
         cout << "  [SCANNING]";
         
-        console.setColor(33); // Yellow
+        console.setColor(33);
         cout << " [ONLINE]";
         
         console.setColor(32);
@@ -242,7 +249,7 @@ public:
         console.setColor(33);
         cout << "║  ┌─────────────┐                                                ║\n";
         cout << "║  │ [CLASSICAL] │                                                ║\n";
-        cout << "║  │    🏛️       │                                                ║\n";
+        cout << "║  │    🏛       │                                                ║\n";
         cout << "║  ├─────────────┤                                                ║\n";
         cout << "║  │ [MEDIEVAL]  │                                                ║\n";
         cout << "║  │    🏰       │                                                ║\n";
@@ -282,8 +289,6 @@ public:
     
     // Draw the Wordle grid
     void drawWordleGrid() {
-        int startY = 8;
-        
         for (int row = 0; row < 6; ++row) {
             cout << "║  ";
             
@@ -301,16 +306,16 @@ public:
                 // Set color based on cell state
                 switch(grid[row][col].state) {
                     case CORRECT:
-                        console.setColor(32); // Green
+                        console.setColor(32);
                         break;
                     case MISPLACED:
-                        console.setColor(33); // Yellow
+                        console.setColor(33);
                         break;
                     case WRONG:
-                        console.setColor(90); // Dark Gray
+                        console.setColor(90);
                         break;
                     default:
-                        console.setColor(37); // Light Gray
+                        console.setColor(37);
                 }
                 
                 // Draw cell based on difficulty
@@ -329,7 +334,7 @@ public:
                     } else {
                         cout << "┌──┐ ";
                     }
-                } else { // EASY
+                } else {
                     if (grid[row][col].state == EMPTY) {
                         cout << "┌───┐ ";
                     } else {
@@ -364,7 +369,7 @@ public:
                             cout << "│" << grid[row][col].letter 
                                  << grid[row][col].letter << "│ ";
                         }
-                    } else { // EASY
+                    } else {
                         if (grid[row][col].state == EMPTY) {
                             cout << "│ " << grid[row][col].letter << " │ ";
                         } else {
@@ -424,7 +429,7 @@ public:
         }
         
         // Fill remaining space
-        int spaces = 70 - (15 + currentGuess.length() * 2);
+        int spaces = 70 - (15 + (int)currentGuess.length() * 2);
         for (int i = 0; i < spaces; ++i) cout << " ";
         
         console.setColor(36);
@@ -439,7 +444,7 @@ public:
         cout << "║  ";
         cout << message;
         // Fill remaining space
-        int spaces = 76 - message.length();
+        int spaces = 76 - (int)message.length();
         for (int i = 0; i < spaces; ++i) cout << " ";
         cout << "║\n";
         console.reset();
@@ -478,6 +483,7 @@ public:
     bool evaluateGuess() {
         if (currentGuess.length() != 5) {
             drawInterface("INCOMPLETE TEMPORAL DATA - Need 5 letters!", 33);
+            this_thread::sleep_for(chrono::milliseconds(1000));
             return false;
         }
         
@@ -531,7 +537,7 @@ public:
         }
         
         drawInterface(failureMessages[rand() % failureMessages.size()], 36);
-        this_thread::sleep_for(milliseconds(800));
+        this_thread::sleep_for(chrono::milliseconds(800));
         
         currentRow++;
         currentGuess = "";
@@ -589,34 +595,39 @@ public:
 #endif
     }
     
-    // Main game loop
+    // Main game loop - FIXED to prevent infinite loop
     void run() {
         drawInterface("Welcome, Time Agent. Decode the historical fragment.", 36);
-        this_thread::sleep_for(milliseconds(2000));
+        this_thread::sleep_for(chrono::milliseconds(2000));
         
+        // Main game loop - runs while game is active AND not won AND attempts remain
         while (gameActive && !gameWon && currentRow < 6) {
             drawInterface();
             
             // Check timer expiration
             if (guessTimer.isExpired()) {
                 drawInterface("⚠ TIME PARADOX! Guess expired! ⚠", 31);
-                this_thread::sleep_for(milliseconds(1500));
+                this_thread::sleep_for(chrono::milliseconds(1500));
                 
                 currentRow++;
                 currentGuess = "";
-                guessTimer.start(timeLimit);
+                
+                if (currentRow < 6) {
+                    guessTimer.start(timeLimit);
+                }
                 
                 if (currentRow >= 6) {
                     gameActive = false;
                     drawInterface();
                     drawStatusMessage("✗ TIMELINE CORRUPTED!", 31);
                     drawStatusMessage("The historical fragment was: " + targetWord, 33);
+                    break;  // Exit the loop immediately
                 }
-                continue;
+                continue;  // Skip input handling for this iteration
             }
             
-            // Handle input
-            if (keyAvailable()) {
+            // Handle input - only if game is still active
+            if (keyAvailable() && gameActive && !gameWon) {
                 char key = getKey();
                 
                 if (key == '\n' || key == '\r') { // Enter key
@@ -634,10 +645,11 @@ public:
                 }
             }
             
-            this_thread::sleep_for(milliseconds(50));
+            // Small delay to prevent CPU overuse
+            this_thread::sleep_for(chrono::milliseconds(50));
         }
         
-        // Game over message
+        // Game over message - always display this after loop ends
         drawInterface();
         if (gameWon) {
             drawStatusMessage("★ TEMPORAL ARCHIVE COMPLETE! ★", 32);
@@ -647,11 +659,8 @@ public:
             drawStatusMessage("Another agent must attempt to restore history.", 33);
         }
         
-        cout << "\n║  Press any key to exit...";
-        for (int i = 0; i < 50; ++i) cout << " ";
-        cout << "║\n";
-        drawBottomBorder();
-        
+        // Wait for user input before exiting
+        drawStatusMessage("Press any key to exit...", 37);
         getKey();
     }
 };
