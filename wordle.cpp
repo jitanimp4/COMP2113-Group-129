@@ -1,7 +1,4 @@
 // TimeSlipSyndicate.cpp
-// The Time-Slip Syndicate - An Architectural Wordle Game
-// ENGG1340/COMP2113 Project
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -159,8 +156,8 @@ private:
     };
     
 public:
-    // Constructor
-    TimeSlipSyndicate(Diff diff) : 
+    // Constructor - FIXED: Changed 'Diff' to 'Difficulty'
+    TimeSlipSyndicate(Difficulty diff) : 
         currentRow(0), 
         gameWon(false), 
         gameActive(true),
@@ -595,12 +592,12 @@ public:
 #endif
     }
     
-    // Main game loop - FIXED to prevent infinite loop
+    // Main game loop
     void run() {
         drawInterface("Welcome, Time Agent. Decode the historical fragment.", 36);
         this_thread::sleep_for(chrono::milliseconds(2000));
         
-        // Main game loop - runs while game is active AND not won AND attempts remain
+        // Main game loop
         while (gameActive && !gameWon && currentRow < 6) {
             drawInterface();
             
@@ -621,19 +618,19 @@ public:
                     drawInterface();
                     drawStatusMessage("✗ TIMELINE CORRUPTED!", 31);
                     drawStatusMessage("The historical fragment was: " + targetWord, 33);
-                    break;  // Exit the loop immediately
+                    break;
                 }
-                continue;  // Skip input handling for this iteration
+                continue;
             }
             
-            // Handle input - only if game is still active
+            // Handle input
             if (keyAvailable() && gameActive && !gameWon) {
                 char key = getKey();
                 
-                if (key == '\n' || key == '\r') { // Enter key
+                if (key == '\n' || key == '\r') {
                     evaluateGuess();
                 } 
-                else if (key == '\b' || key == 127) { // Backspace
+                else if (key == '\b' || key == 127) {
                     if (!currentGuess.empty()) {
                         currentGuess.pop_back();
                     }
@@ -645,11 +642,10 @@ public:
                 }
             }
             
-            // Small delay to prevent CPU overuse
             this_thread::sleep_for(chrono::milliseconds(50));
         }
         
-        // Game over message - always display this after loop ends
+        // Game over message
         drawInterface();
         if (gameWon) {
             drawStatusMessage("★ TEMPORAL ARCHIVE COMPLETE! ★", 32);
@@ -659,7 +655,6 @@ public:
             drawStatusMessage("Another agent must attempt to restore history.", 33);
         }
         
-        // Wait for user input before exiting
         drawStatusMessage("Press any key to exit...", 37);
         getKey();
     }
