@@ -58,7 +58,9 @@ bool CelluloidApp::loadFiles() {
         cout << "\033[1;31m [ERROR] movies.txt is empty.\033[0m\n";
         return false;
     }
-    random_shuffle(siteDatabase.begin(), siteDatabase.end());
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(siteDatabase.begin(), siteDatabase.end(), g);
     
     return true;
 }
@@ -75,7 +77,12 @@ void CelluloidApp::playRound() {
     
     if (currentSiteIndex >= siteDatabase.size()) {
         cout << "\n\033[1;36m[SYSTEM] All records decrypted. Reshuffling the archive...\033[0m\n";
-        random_shuffle(siteDatabase.begin(), siteDatabase.end());
+        
+        // NEW: Modern C++ way to reshuffle
+        random_device rd;
+        mt19937 g(rd());
+        shuffle(siteDatabase.begin(), siteDatabase.end(), g);
+        
         currentSiteIndex = 0; 
     }
 
