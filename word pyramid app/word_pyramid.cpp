@@ -568,7 +568,7 @@ void WordPyramidGame::runGameLoop() {
 
 void runWordPyramidGame() {
   std::cout << "===============================================\n";
-  std::cout << "        WORD PYRAMIDS OF GIZA MINI-GAME        \n";
+  std::cout << "             WORD PYRAMIDS OF GIZA             \n";
   std::cout << "===============================================\n";
   std::cout << "Greetings brave traveller. You are stuck in the haunting Word Pyramids of Giza. To escape, you must successfully find and unscramble the words hidden in the words pyramid below. If you think you have found a word, type it out. The letters, category and number of words to find are provided to you. And remember, if you take a wrong turn, press the “Clear” button. Good luck!\n";
 
@@ -614,8 +614,6 @@ void runWordPyramidGame() {
     if (c != 'Y') {
       keepPlaying = false;
     }
-    std::cout << "\n";
   }
-
-  std::cout << "Farewell, explorer.\n";
+    std::cout << "\n";
 }
