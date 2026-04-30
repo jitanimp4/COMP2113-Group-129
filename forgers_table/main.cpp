@@ -639,31 +639,25 @@ Difficulty selectDifficulty() {
 // MAIN
 // ══════════════════════════════════════════════════════════════
 
-int main() {
+// ══════════════════════════════════════════════════════════════
+// MAIN
+// ══════════════════════════════════════════════════════════════
+
+void runForgersTable() { // <--- CHANGED FROM int main()
     showIntro();
 
     // Locate forger_bank.txt next to the binary
     std::vector<Artifact> arts = loadArtifacts("forger_bank.txt");
     if (arts.empty()) {
         std::cout << "\n  [CRITICAL: No artifacts loaded. Ensure forger_bank.txt is present.]\n";
-        return 1;
+        return; // <--- CHANGED FROM return 1;
     }
-    std::cout << "  [" << arts.size() << " artifact records loaded]\n\n";
-
-    bool playing = true;
-    while (playing) {
-        Difficulty diff = selectDifficulty();
-        playRound(diff, arts);
-
-        std::cout << "\n  ── Play another round? (Y / N): ";
-        std::string again;
-        std::getline(std::cin, again);
-        playing = (toUp(trimStr(again)) == "Y");
-        if (playing) { clearScreen(); showIntro(); }
-    }
+    
+    // ... (keep the rest of the game loop exactly the same) ...
 
     std::cout << '\n';
     tw("  [ODYSSEY OS]: Agent dismissed. Heritage database stabilising.", 16);
     std::cout << "  [ODYSSEY OS]: Cryptex decryption queued for next session.\n\n";
-    return 0;
+    
+    return; // <--- CHANGED FROM return 0;
 }
