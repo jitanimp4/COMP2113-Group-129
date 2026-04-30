@@ -27,7 +27,8 @@
 #else
   #include <unistd.h>
   void sleepMs(int ms) { usleep(static_cast<useconds_t>(ms) * 1000); }
-  void clearScreen()   { system("clear"); }
+  // FIXED: Catches the return value of system("clear") to remove the compiler warning
+  void clearScreen()   { int ret = system("clear"); (void)ret; }
 #endif
 
 // ── Constants ──────────────────────────────────────────────────
@@ -175,7 +176,7 @@ void showForgeryAlert() {
     std::string banner =
         "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
         "  !      F O R G E R Y   A L E R T               !\n"
-        "  !           SUSPECT  IDENTIFIED                  !\n"
+        "  !            SUSPECT  IDENTIFIED                 !\n"
         "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 
     for (int i = 0; i < 2; i++) {
@@ -533,7 +534,7 @@ void playRound(Difficulty diff, std::vector<Artifact>& arts) {
     clearScreen();
     std::cout << '\n';
     std::cout << "  ╔══════════════════════════════════════════════════════════════════╗\n";
-    std::cout << "  ║                     CASE FILE SUMMARY                           ║\n";
+    std::cout << "  ║                      CASE FILE SUMMARY                           ║\n";
     std::cout << "  ╚══════════════════════════════════════════════════════════════════╝\n\n";
 
     int numCorrect = 0;
@@ -578,8 +579,8 @@ void showIntro() {
     clearScreen();
     std::cout << "\n\n";
     std::cout << "  ╔══════════════════════════════════════════════════════════════╗\n";
-    std::cout << "  ║        INTERPOL ARTIFACT AUTHENTICATION UNIT                ║\n";
-    std::cout << "  ║               ─── ODYSSEY OS v2.7 ───                       ║\n";
+    std::cout << "  ║        INTERPOL ARTIFACT AUTHENTICATION UNIT                 ║\n";
+    std::cout << "  ║                ─── ODYSSEY OS v2.7 ───                       ║\n";
     std::cout << "  ╚══════════════════════════════════════════════════════════════╝\n\n";
 
     auto loadStep = [](const std::string& msg, int baseMs) {
@@ -620,7 +621,7 @@ Difficulty selectDifficulty() {
     std::cout << "  │                                           │\n";
     std::cout << "  │  [3]  MASTER CURATOR  (Hard)              │\n";
     std::cout << "  │       2 lives · 3 forgeries · 30s timer   │\n";
-    std::cout << "  │       Some pairs may be AUTHENTIC          │\n";
+    std::cout << "  │       Some pairs may be AUTHENTIC         │\n";
     std::cout << "  └───────────────────────────────────────────┘\n\n";
     std::cout << "  Enter clearance level (1 / 2 / 3): ";
 
