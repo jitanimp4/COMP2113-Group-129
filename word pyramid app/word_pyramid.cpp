@@ -564,6 +564,26 @@ void WordPyramidGame::printPyramid() const {
  * Return value: none.
  */
 void WordPyramidGame::displayGameState() const {
+  std::cout << "\n--------------------------------------------------\n";
+  switch (currentDifficulty) {
+    case 1:
+      std::cout<<"Category: Gods, Monsters, and Myths (Greek, Roman, Egyptian, Hindu, Nordic)\n";
+      break;
+
+    case 2:
+      std::cout<<"Category: Empires, Innovation, Monuments\n";
+      break;
+    
+    case 3:
+      std::cout<<"Category: Rulers, Pharaohs, and Heroes (Greek, Roman, Egyptian, Nordic)\n";
+      break;
+
+    defaultP
+      std::cout<<"Category: Unknown\n";
+  }
+  std::cout << "Number of words: " << activePuzzle->targetWords.size() << "\n";
+  std::cout << "--------------------------------------------------\n";
+
   printPyramid();
   printGuessedWords();
   std::cout << "Hints remaining: " << activePuzzle->hintsRemaining << "\n";
