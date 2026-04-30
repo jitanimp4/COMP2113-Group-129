@@ -4,13 +4,14 @@
 #include <sstream>
 #include <cstdlib>
 #include <cctype> 
-#include <algorithm> // NEW: Required for random_shuffle
+#include <algorithm> 
+#include <random>
 
 using namespace std;
 
 CelluloidApp::CelluloidApp(int difficulty) {
     difficultyLevel = difficulty;
-    currentSiteIndex = 0; // NEW: Start at the top of the deck
+    currentSiteIndex = 0; 
 
     if (difficulty == 1) {
         lives = 4;
@@ -57,8 +58,6 @@ bool CelluloidApp::loadFiles() {
         cout << "\033[1;31m [ERROR] movies.txt is empty.\033[0m\n";
         return false;
     }
-
-    // NEW: Shuffle the deck of movies as soon as they are loaded
     random_shuffle(siteDatabase.begin(), siteDatabase.end());
     
     return true;
@@ -73,14 +72,14 @@ void CelluloidApp::printFilmReel(int livesRemaining) {
 }
 
 void CelluloidApp::playRound() {
-    // NEW: Check if we have played all movies. If so, reshuffle!
+    
     if (currentSiteIndex >= siteDatabase.size()) {
         cout << "\n\033[1;36m[SYSTEM] All records decrypted. Reshuffling the archive...\033[0m\n";
         random_shuffle(siteDatabase.begin(), siteDatabase.end());
         currentSiteIndex = 0; 
     }
 
-    // NEW: Draw the next movie from the top of the shuffled deck
+   
     HeritageSite targetSite = siteDatabase[currentSiteIndex];
     currentSiteIndex++; // Move down the deck for the next round
 
@@ -106,7 +105,7 @@ void CelluloidApp::playRound() {
         cout << "Target: " << guessedState << "\n";
         cout << "Enter a letter to guess: ";
 
-        // NEW: Bulletproof Input Validation to prevent crashes
+       
         string input;
         char guess;
         while (true) {
