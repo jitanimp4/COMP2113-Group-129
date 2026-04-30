@@ -38,13 +38,10 @@ bool WordPyramidGame::loadWordBank(const std::string& fileName, std::vector<std:
   return !words.empty();
 }
 
-/**
- * Checks whether a puzzle candidate satisfies assignment constraints.
- * Input parameters:
- * - words: candidate puzzle word list.
- * Return value:
- * - true if words count in [4,7] and total chars in [40,60], else false.
- */
+//  Checks whether a puzzle candidate satisfies assignment constraints.
+//  Input parameters: words: candidate puzzle word list.
+//  Return value: true if words count in [4,7] and total chars in [40,60], else false.
+
 bool WordPyramidGame::validatePuzzleConstraints(const std::vector<std::string>& words) const {
   if (words.size() < 4 || words.size() > 7) {
     return false;
@@ -57,14 +54,10 @@ bool WordPyramidGame::validatePuzzleConstraints(const std::vector<std::string>& 
   return totalChars >= 40 && totalChars <= 60;
 }
 
-/**
- * Generates random puzzle sets from a loaded word bank while satisfying constraints.
- * Input parameters:
- * - words: source word bank for one difficulty.
- * - desiredPuzzles: number of valid puzzles to attempt to produce.
- * Return value:
- * - vector of puzzle word sets.
- */
+//  Generates random puzzle sets from a loaded word bank while satisfying constraints.
+//  Input parameters: words: source word bank for one difficulty. desiredPuzzles: number of valid puzzles to attempt to produce.
+//  Return value:vector of puzzle word sets.
+
 std::vector<std::vector<std::string> > WordPyramidGame::generatePuzzlesFromWordBank(
     const std::vector<std::string>& words, int desiredPuzzles) {
   std::vector<std::vector<std::string> > puzzles;
@@ -119,11 +112,11 @@ std::vector<std::vector<std::string> > WordPyramidGame::generatePuzzlesFromWordB
   return puzzles;
 }
 
-/**
- * Creates fallback built-in puzzle sets and optionally replaces them from file word banks.
- * Input parameters: none.
- * Return value: none.
- */
+
+ // Creates fallback built-in puzzle sets and optionally replaces them from file word banks.
+ // Input parameters: none.
+ // Return value: none.
+ 
 void WordPyramidGame::buildPuzzleSets() {
   easyPuzzles.clear();
   mediumPuzzles.clear();
@@ -224,13 +217,10 @@ void WordPyramidGame::buildPuzzleSets() {
   }
 }
 
-/**
- * Builds a flattened real-letter pool from target words.
- * Input parameters:
- * - words: list of target words.
- * Return value:
- * - vector of all letters in row-major source order before shuffling.
- */
+// Builds a flattened real-letter pool from target words.
+//  Input parameters: words: list of target words.
+//  Return value: vector of all letters in row-major source order before shuffling.
+
 std::vector<char> WordPyramidGame::buildLetterPool(const std::vector<std::string>& words) const {
   std::vector<char> letters;
   for (size_t i = 0; i < words.size(); ++i) {
@@ -256,13 +246,10 @@ int WordPyramidGame::computeTriangleRows(int letterCount) const {
   return n;
 }
 
-/**
- * Initializes one round using selected difficulty and random puzzle.
- * Input parameters:
- * - difficultyChoice: 1 easy, 2 medium, 3 hard.
- * Return value:
- * - true if a puzzle was successfully prepared, false otherwise.
- */
+// Initializes one round using selected difficulty and random puzzle.
+// Input parameters: difficultyChoice: 1 easy, 2 medium, 3 hard.
+// Return value: true if a puzzle was successfully prepared, false otherwise.
+ 
 bool WordPyramidGame::initialize(int difficultyChoice) {
   if (activePuzzle != NULL) {
     delete activePuzzle;
@@ -307,11 +294,10 @@ bool WordPyramidGame::initialize(int difficultyChoice) {
   return true;
 }
 
-/**
- * Restores the active puzzle to original shuffled letters and clears progress.
- * Input parameters: none.
- * Return value: none.
- */
+// Restores the active puzzle to original shuffled letters and clears progress.
+// Input parameters: none.
+// Return value: none.
+
 void WordPyramidGame::clearPuzzle() {
   if (activePuzzle == NULL) {
     return;
@@ -322,13 +308,10 @@ void WordPyramidGame::clearPuzzle() {
   activePuzzle->hintsRemaining = 3;
 }
 
-/**
- * Converts user text to uppercase and removes spaces.
- * Input parameters:
- * - input: raw user text.
- * Return value:
- * - uppercase compacted string.
- */
+// Converts user text to uppercase and removes spaces.
+// Input parameters: input: raw user text.
+// Return value:uppercase compacted string.
+ 
 std::string WordPyramidGame::normalizeInput(const std::string& input) const {
   std::string result;
   for (size_t i = 0; i < input.size(); ++i) {
@@ -340,13 +323,10 @@ std::string WordPyramidGame::normalizeInput(const std::string& input) const {
   return result;
 }
 
-/**
- * Checks whether a word contains only alphabetic characters.
- * Input parameters:
- * - word: uppercase candidate guess.
- * Return value:
- * - true if every character is A-Z and word is non-empty.
- */
+// Checks whether a word contains only alphabetic characters.
+// Input parameters: word: uppercase candidate guess.
+// Return value:true if every character is A-Z and word is non-empty.
+
 bool WordPyramidGame::isAlphabeticWord(const std::string& word) const {
   if (word.empty()) {
     return false;
@@ -359,13 +339,10 @@ bool WordPyramidGame::isAlphabeticWord(const std::string& word) const {
   return true;
 }
 
-/**
- * Verifies the current real-letter pool can build a given word using frequencies.
- * Input parameters:
- * - word: uppercase guess.
- * Return value:
- * - true if word can be formed from current real letters.
- */
+// Verifies the current real-letter pool can build a given word using frequencies.
+// Input parameters:word: uppercase guess.
+// Return value: true if word can be formed from current real letters.
+ 
 bool WordPyramidGame::canConstructWord(const std::string& word) const {
   if (activePuzzle == NULL) {
     return false;
@@ -381,12 +358,10 @@ bool WordPyramidGame::canConstructWord(const std::string& word) const {
   return true;
 }
 
-/**
- * Removes letters of a guessed word from the real-letter pool while preserving order.
- * Input parameters:
- * - word: uppercase word already validated against pool.
- * Return value: none.
- */
+// Removes letters of a guessed word from the real-letter pool while preserving order.
+// Input parameters: word: uppercase word already validated against pool.
+// Return value: none.
+
 void WordPyramidGame::removeWordLettersFromPool(const std::string& word) {
   if (activePuzzle == NULL) {
     return;
@@ -400,13 +375,10 @@ void WordPyramidGame::removeWordLettersFromPool(const std::string& word) {
   }
 }
 
-/**
- * Finds index of a target word in the active puzzle.
- * Input parameters:
- * - word: uppercase candidate.
- * Return value:
- * - non-negative index if found, or -1 if not a target word.
- */
+// Finds index of a target word in the active puzzle.
+// Input parameters: word: uppercase candidate.
+// Return value: non-negative index if found, or -1 if not a target word.
+
 int WordPyramidGame::findTargetWordIndex(const std::string& word) const {
   if (activePuzzle == NULL) {
     return -1;
@@ -419,12 +391,10 @@ int WordPyramidGame::findTargetWordIndex(const std::string& word) const {
   return -1;
 }
 
-/**
- * Applies one validated user guess: consume letters and update guessed/correct state.
- * Input parameters:
- * - word: uppercase valid input.
- * Return value: none.
- */
+// Applies one validated user guess: consume letters and update guessed/correct state.
+// Input parameters: word: uppercase valid input.
+// Return value: none.
+
 void WordPyramidGame::processGuess(const std::string& word) {
   removeWordLettersFromPool(word);
   activePuzzle->guessedWords.push_back(word);
@@ -440,12 +410,10 @@ void WordPyramidGame::processGuess(const std::string& word) {
   }
 }
 
-/**
- * Determines if all target words have already been guessed correctly.
- * Input parameters: none.
- * Return value:
- * - true when every target word flag is true.
- */
+// Determines if all target words have already been guessed correctly.
+// Input parameters: none.
+// Return value:true when every target word flag is true.
+
 bool WordPyramidGame::allTargetWordsGuessed() const {
   if (activePuzzle == NULL) {
     return false;
@@ -458,12 +426,10 @@ bool WordPyramidGame::allTargetWordsGuessed() const {
   return true;
 }
 
-/**
- * Counts how many target words remain unguessed.
- * Input parameters: none.
- * Return value:
- * - number of target words still missing.
- */
+// Counts how many target words remain unguessed.
+// Input parameters: none.
+// Return value:number of target words still missing.
+
 int WordPyramidGame::countWordsLeft() const {
   if (activePuzzle == NULL) {
     return 0;
@@ -477,11 +443,10 @@ int WordPyramidGame::countWordsLeft() const {
   return left;
 }
 
-/**
- * Uses one hint to auto-solve a random unguessed target word and consume letters.
- * Input parameters: none.
- * Return value: none.
- */
+// Uses one hint to auto-solve a random unguessed target word and consume letters.
+// Input parameters: none.
+// Return value: none.
+
 void WordPyramidGame::processHint() {
   if (activePuzzle->hintsRemaining <= 0) {
     std::cout << "No hints remaining.\n";
@@ -513,11 +478,10 @@ void WordPyramidGame::processHint() {
   processGuess(hintedWord);
 }
 
-/**
- * Prints guessed words list in order of guesses.
- * Input parameters: none.
- * Return value: none.
- */
+// Prints guessed words list in order of guesses.
+// Input parameters: none.
+// Return value: none.
+
 void WordPyramidGame::printGuessedWords() const {
   std::cout << "Guessed words: ";
   if (activePuzzle->guessedWords.empty()) {
@@ -533,11 +497,10 @@ void WordPyramidGame::printGuessedWords() const {
   std::cout << "\n";
 }
 
-/**
- * Prints current pyramid as a perfect triangle using real letters plus fixed dummy cells.
- * Input parameters: none.
- * Return value: none.
- */
+// Prints current pyramid as a perfect triangle using real letters plus fixed dummy cells.
+// Input parameters: none.
+// Return value: none.
+ 
 void WordPyramidGame::printPyramid() const {
   std::vector<char> displayLetters = activePuzzle->currentRealLetters;
   for (int i = 0; i < activePuzzle->dummyCount; ++i) {
@@ -559,11 +522,10 @@ void WordPyramidGame::printPyramid() const {
   }
 }
 
-/**
- * Displays all round UI details before asking for next input.
- * Input parameters: none.
- * Return value: none.
- */
+// Displays all round UI details before asking for next input.
+//  Input parameters: none.
+// Return value: none.
+ 
 void WordPyramidGame::displayGameState() const {
   std::cout << "\n--------------------------------------------------\n";
   switch (currentDifficulty) {
@@ -592,12 +554,10 @@ void WordPyramidGame::displayGameState() const {
   std::cout << "--------------------------------------------------\n";
 }
 
-/**
- * Appends game outcome to a local log file, demonstrating file output usage.
- * Input parameters:
- * - won: true if round ended in victory, false otherwise.
- * Return value: none.
- */
+// Appends game outcome to a local log file, demonstrating file output usage.
+// Input parameters: won: true if round ended in victory, false otherwise.
+// Return value: none.
+ 
 void WordPyramidGame::logGameResult(bool won) const {
   std::ofstream out("game_log.txt", std::ios::app);
   if (!out.is_open() || activePuzzle == NULL) {
@@ -608,11 +568,10 @@ void WordPyramidGame::logGameResult(bool won) const {
       << " | hints_left=" << activePuzzle->hintsRemaining << "\n";
 }
 
-/**
- * Runs one full puzzle loop until victory or EOF/input termination.
- * Input parameters: none.
- * Return value: none.
- */
+// Runs one full puzzle loop until victory or EOF/input termination.
+// Input parameters: none.
+//  Return value: none.
+ 
 void WordPyramidGame::runGameLoop() {
   if (activePuzzle == NULL) {
     std::cout << "No active puzzle available.\n";
@@ -622,7 +581,7 @@ void WordPyramidGame::runGameLoop() {
   std::string rawInput;
   while (true) {
     displayGameState();
-    std::cout << "Enter a word, 'clear', or 'hint': ";
+    std::cout << "Player input: ";
     if (!std::getline(std::cin, rawInput)) {
       std::cout << "\nInput ended. Leaving game.\n";
       logGameResult(false);
@@ -663,11 +622,10 @@ void WordPyramidGame::runGameLoop() {
   }
 }
 
-/**
- * Launches the full interactive game with menu and replay options.
- * Input parameters: none.
- * Return value: none.
- */
+// Launches the full interactive game with menu and replay options.
+//  Input parameters: none.
+// Return value: none.
+
 void runWordPyramidGame() {
   std::cout << "===============================================\n";
   std::cout << "        WORD PYRAMIDS OF GIZA MINI-GAME        \n";
@@ -675,7 +633,8 @@ void runWordPyramidGame() {
   std::cout << "Greetings brave traveller. You are stuck in the haunting Word Pyramids of Giza. "
                "To escape, find and unscramble the hidden words in the pyramid below. "
                "If you think you found a word, type it out. The letters, category, and number "
-               "of words are provided. If you take a wrong turn, type \"clear\". Good luck!\n";
+               "of words are provided. If you take a wrong turn, type "clear". If you want a hint,"
+                "type "hint". To exit the game type "exit". Good luck with your mission!\n";
 
   bool keepPlaying = true;
   while (keepPlaying) {
@@ -705,8 +664,13 @@ void runWordPyramidGame() {
       continue;
     }
 
-    game->runGameLoop();
+    int exitCode = game->runGameloop();
     delete game;
+
+    if (exitCode==1) {
+      keepPlaying = false;
+      break;
+    }
 
     std::cout << "\nPlay again? (Y/N): ";
     std::string replay;
