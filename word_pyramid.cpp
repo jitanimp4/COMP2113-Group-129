@@ -572,7 +572,7 @@ void WordPyramidGame::logGameResult(bool won) const {
 // Input parameters: none.
 //  Return value: none.
  
-void WordPyramidGame::runGameLoop() {
+bool WordPyramidGame::runGameLoop() {
   if (activePuzzle == NULL) {
     std::cout << "No active puzzle available.\n";
     return;
@@ -601,11 +601,16 @@ void WordPyramidGame::runGameLoop() {
         std::cout << "Congratulations! You have successfully escaped from the Word Pyramids of Giza. "
                      "Good luck on your journey brave explorer!\n";
         logGameResult(true);
-        return;
+        return false;
       }
       continue;
     }
 
+    if (input == "EXIT"){
+      std::count <<"Returning to main menu.\n";
+      return true;
+    }
+        
     if (!isAlphabeticWord(input) || !canConstructWord(input)) {
       std::cout << "Invalid Input. Please ONLY use letters in the word pyramid.\n";
       continue;
@@ -633,8 +638,8 @@ void runWordPyramidGame() {
   std::cout << "Greetings brave traveller. You are stuck in the haunting Word Pyramids of Giza. "
                "To escape, find and unscramble the hidden words in the pyramid below. "
                "If you think you found a word, type it out. The letters, category, and number "
-               "of words are provided. If you take a wrong turn, type "clear". If you want a hint,"
-                "type "hint". To exit the game type "exit". Good luck with your mission!\n";
+               "of words are provided. If you take a wrong turn, type 'clear'. If you want a hint,"
+                "type 'hint'. To exit the game type 'exit'. Good luck with your mission!\n";
 
   bool keepPlaying = true;
   while (keepPlaying) {
@@ -664,11 +669,10 @@ void runWordPyramidGame() {
       continue;
     }
 
-    int exitCode = game->runGameloop();
+    bool userWantstoExit=gam game->runGameLoop();
     delete game;
-
-    if (exitCode==1) {
-      keepPlaying = false;
+    
+    if (userWantstoExit) {
       break;
     }
 
