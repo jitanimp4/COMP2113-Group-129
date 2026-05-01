@@ -43,12 +43,12 @@ The player interacts with **Odyssey OS**, a system housing encrypted data of his
 ## Mini-Games Overview
 
 ### App 1: Word Pyramids of Giza
-**Theme:** Ancient Civilizations, Gods, Mythology
+**Theme:** Ancient Ruins & Myths
 **Game Mechanics:**
-- A Word Pyramid puzzle with letters arranged in a triangular formation.
-- Categories include Egyptian pharaohs, Greek and Roman gods, ancient civilizations like the Maya and Inca, etc.
+- Word Pyramids of Giza is a puzzle mini‑game set in ancient Egypt. The player sees a triangular pyramid of scrambled letters hiding 4–7 historical or mythological words (e.g., gods, empires, rulers). By typing valid words from the letter pool, the letters are removed from the pyramid. The goal is to uncover all hidden words before the timer runs out (optional). The game includes a clear reset and a hint system (max 3 hints).
+- Categories include Easy) Gods, Monsters, and Myths, (Medium) Empires, Innovation, Monuments, (Hard) Rulers, Pharaohs, and Heros.
 - Players must find words from a letter pool to complete the pyramid.
-- Difficulty: Easy, Medium, Hard with a timer for added pressure.
+- Difficulty: Easy, Medium, Hard.
 
 ### App 2: The Director's Archive
 **Theme:** Movies and Heritage Sites  
