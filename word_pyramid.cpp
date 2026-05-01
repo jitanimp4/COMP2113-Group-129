@@ -2,7 +2,6 @@
 
 using namespace std;
 
-
 WordPyramidGame::WordPyramidGame() : activePuzzle(NULL), currentDifficulty(0) {
   std::random_device rd;
   rng.seed(rd());
@@ -575,7 +574,7 @@ void WordPyramidGame::logGameResult(bool won) const {
 bool WordPyramidGame::runGameLoop() {
   if (activePuzzle == NULL) {
     std::cout << "No active puzzle available.\n";
-    return;
+    return false;
   }
 
   std::string rawInput;
@@ -585,7 +584,7 @@ bool WordPyramidGame::runGameLoop() {
     if (!std::getline(std::cin, rawInput)) {
       std::cout << "\nInput ended. Leaving game.\n";
       logGameResult(false);
-      return;
+      return false;
     }
 
     std::string input = normalizeInput(rawInput);
@@ -607,7 +606,7 @@ bool WordPyramidGame::runGameLoop() {
     }
 
     if (input == "EXIT"){
-      std::count <<"Returning to main menu.\n";
+      std::cout <<"Returning to main menu.\n";
       return true;
     }
         
@@ -622,7 +621,7 @@ bool WordPyramidGame::runGameLoop() {
       std::cout << "Congratulations! You have successfully escaped from the Word Pyramids of Giza. "
                    "Good luck on your journey brave explorer!\n";
       logGameResult(true);
-      return;
+      return false;
     }
   }
 }
@@ -669,7 +668,7 @@ void runWordPyramidGame() {
       continue;
     }
 
-    bool userWantstoExit=gam game->runGameLoop();
+    bool userWantstoExit= game->runGameLoop();
     delete game;
     
     if (userWantstoExit) {
