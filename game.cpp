@@ -1,5 +1,5 @@
 #include "game.h"
-
+#include "art.h"
 #include "puzzle.h"
 
 #include <algorithm>
@@ -12,337 +12,387 @@
 #include <random>
 #include <sstream>
 
-namespace {
-
-// Returns a seeded random number generator
-// return reference to static mt19937 RNG
-std::mt19937 &globalRng() {
-    static std::mt19937 rng(
-        static_cast<unsigned>(std::chrono::steady_clock::now().time_since_epoch().count()));
-    return rng;
-}
-
-// Converts entire string to uppercase
-// s input string
-// return uppercase version of s
-std::string toUpper(std::string s) {
-    for (char &c : s) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
-    return s;
-}
-
-// Removes leading and trailing whitespace from string
-// s input string
-// return trimmed string
-std::string trim(const std::string &s) {
-    std::size_t i = 0;
-    std::size_t j = s.size();
-    while (i < s.size() && std::isspace(static_cast<unsigned char>(s[i]))) i++;
-    while (j > i && std::isspace(static_cast<unsigned char>(s[j - 1]))) j--;
-    return s.substr(i, j - i);
-}
-
-// Removes non-alphabetic chars and converts to uppercase
-// s input string
-// return normalized string (only A-Z letters)
-std::string normalizeWord(const std::string &s) {
-    std::string out;
-    for (char c : s) {
-        if (std::isalpha(static_cast<unsigned char>(c))) {
-            out.push_back(static_cast<char>(std::toupper(static_cast<unsigned char>(c))));
-        }
-    }
-    return out;
-}
-
-// Converts Direction enum to integer (0=Across, 1=Down)
-// d Direction enum
-// return 0 for Across, 1 for Down
-int directionToInt(Direction d) { return d == Direction::Across ? 0 : 1; }
-
-// Converts integer back to Direction enum
-// x 0 for Across, 1 for Down
-// return Direction enum value
-Direction intToDirection(int x) { return x == 0 ? Direction::Across : Direction::Down; }
-
-// Saves entire game state to a text file
-// path filename to save to
-// meta game metadata (difficulty, elapsed time, bell state)
-// state current game state (grid, clues, solved words, score)
-// return true if save successful, false otherwise
-bool saveGame(const std::string &path, const SaveMeta &meta, const GameState &state) {
-    std::ofstream out(path.c_str());
-    if (!out) return false;
-    out << "CW_SAVE_V1\n";
-    out << meta.difficultyChoice << " " << meta.elapsedSeconds << " " << (meta.hardBellPlayed ? 1 : 0) << "\n";
-    out << state.score << " " << state.hintsUsed << " " << state.currentStreak << "\n";
-    out << state.solutionGrid.size() << "\n";
-    for (const auto &row : state.solutionGrid) out << row << "\n";
-
-    out << state.numbering.size() << " " << (state.numbering.empty() ? 0 : state.numbering[0].size()) << "\n";
-    for (const auto &row : state.numbering) {
-        for (std::size_t i = 0; i < row.size(); i++) {
-            if (i) out << " ";
-            out << row[i];
-        }
-        out << "\n";
-    }
-
-    out << state.clues.size() << "\n";
-    for (const auto &cl : state.clues) {
-        out << cl.number << "|" << directionToInt(cl.direction) << "|" << cl.answer << "|" << cl.row << "|" << cl.col
-            << "|" << cl.clueText << "\n";
-    }
-
-    out << state.wordBank.size() << "\n";
-    for (const auto &w : state.wordBank) out << w << "\n";
-    out << state.remainingWords.size() << "\n";
-    for (const auto &w : state.remainingWords) out << w << "\n";
-
-    out << state.solvedByKey.size() << "\n";
-    for (const auto &entry : state.solvedByKey) {
-        out << entry.first.first << "|" << directionToInt(entry.first.second) << "|" << entry.second << "\n";
-    }
-    return true;
-}
-
-// Loads a previously saved game from a text file
-// path filename to load from
-// meta output parameter for loaded metadata
-// state output parameter for loaded game state
-// return true if load successful, false otherwise
-bool loadGame(const std::string &path, SaveMeta &meta, GameState &state) {
-    std::ifstream in(path.c_str());
-    if (!in) return false;
-    std::string line;
-    if (!std::getline(in, line) || line != "CW_SAVE_V1") return false;
-
-    if (!std::getline(in, line)) return false;
+namespace
+{
+    std::mt19937 &globalRng()
     {
-        std::istringstream iss(line);
-        int bell = 0;
-        if (!(iss >> meta.difficultyChoice >> meta.elapsedSeconds >> bell)) return false;
-        meta.hardBellPlayed = (bell != 0);
+        static std::mt19937 rng(
+            static_cast<unsigned>(std::chrono::steady_clock::now().time_since_epoch().count()));
+        return rng;
     }
 
-    if (!std::getline(in, line)) return false;
+    std::string toUpper(std::string s)
     {
-        std::istringstream iss(line);
-        if (!(iss >> state.score >> state.hintsUsed >> state.currentStreak)) return false;
+        for (char &c : s)
+            c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+        return s;
     }
 
-    if (!std::getline(in, line)) return false;
-    int gridRows = std::stoi(line);
-    state.solutionGrid.clear();
-    for (int i = 0; i < gridRows; i++) {
-        if (!std::getline(in, line)) return false;
-        state.solutionGrid.push_back(line);
-    }
-
-    if (!std::getline(in, line)) return false;
+    std::string trim(const std::string &s)
     {
-        std::istringstream iss(line);
-        int rows = 0, cols = 0;
-        if (!(iss >> rows >> cols)) return false;
-        state.numbering.assign(rows, std::vector<int>(cols, 0));
-        for (int r = 0; r < rows; r++) {
-            if (!std::getline(in, line)) return false;
-            std::istringstream rowStream(line);
-            for (int c = 0; c < cols; c++) rowStream >> state.numbering[r][c];
+        std::size_t i = 0;
+        std::size_t j = s.size();
+        while (i < s.size() && std::isspace(static_cast<unsigned char>(s[i])))
+            i++;
+        while (j > i && std::isspace(static_cast<unsigned char>(s[j - 1])))
+            j--;
+        return s.substr(i, j - i);
+    }
+
+    std::string normalizeWord(const std::string &s)
+    {
+        std::string out;
+        for (char c : s)
+        {
+            if (std::isalpha(static_cast<unsigned char>(c)))
+            {
+                out.push_back(static_cast<char>(std::toupper(static_cast<unsigned char>(c))));
+            }
         }
+        return out;
     }
 
-    if (!std::getline(in, line)) return false;
-    int clueCount = std::stoi(line);
-    state.clues.clear();
-    for (int i = 0; i < clueCount; i++) {
-        if (!std::getline(in, line)) return false;
-        std::stringstream ss(line);
-        std::string a, b, c, d, e, f;
-        std::getline(ss, a, '|');
-        std::getline(ss, b, '|');
-        std::getline(ss, c, '|');
-        std::getline(ss, d, '|');
-        std::getline(ss, e, '|');
-        std::getline(ss, f);
-        state.clues.push_back(
-            {std::stoi(a), intToDirection(std::stoi(b)), c, f, std::stoi(d), std::stoi(e)});
+    int directionToInt(Direction d) { return d == Direction::Across ? 0 : 1; }
+    Direction intToDirection(int x) { return x == 0 ? Direction::Across : Direction::Down; }
+
+    bool saveGame(const std::string &path, const SaveMeta &meta, const GameState &state)
+    {
+        std::ofstream out(path.c_str());
+        if (!out)
+            return false;
+        out << "CW_SAVE_V1\n";
+        out << meta.difficultyChoice << " " << meta.elapsedSeconds << " " << (meta.hardBellPlayed ? 1 : 0) << "\n";
+        out << state.score << " " << state.hintsUsed << " " << state.currentStreak << "\n";
+        out << state.solutionGrid.size() << "\n";
+        for (const auto &row : state.solutionGrid)
+            out << row << "\n";
+
+        out << state.numbering.size() << " " << (state.numbering.empty() ? 0 : state.numbering[0].size()) << "\n";
+        for (const auto &row : state.numbering)
+        {
+            for (std::size_t i = 0; i < row.size(); i++)
+            {
+                if (i)
+                    out << " ";
+                out << row[i];
+            }
+            out << "\n";
+        }
+
+        out << state.clues.size() << "\n";
+        for (const auto &cl : state.clues)
+        {
+            out << cl.number << "|" << directionToInt(cl.direction) << "|" << cl.answer << "|" << cl.row << "|" << cl.col
+                << "|" << cl.clueText << "\n";
+        }
+
+        out << state.wordBank.size() << "\n";
+        for (const auto &w : state.wordBank)
+            out << w << "\n";
+        out << state.remainingWords.size() << "\n";
+        for (const auto &w : state.remainingWords)
+            out << w << "\n";
+
+        out << state.solvedByKey.size() << "\n";
+        for (const auto &entry : state.solvedByKey)
+        {
+            out << entry.first.first << "|" << directionToInt(entry.first.second) << "|" << entry.second << "\n";
+        }
+        return true;
     }
 
-    if (!std::getline(in, line)) return false;
-    int bankCount = std::stoi(line);
-    state.wordBank.clear();
-    for (int i = 0; i < bankCount; i++) {
-        if (!std::getline(in, line)) return false;
-        state.wordBank.push_back(line);
+    bool loadGame(const std::string &path, SaveMeta &meta, GameState &state)
+    {
+        std::ifstream in(path.c_str());
+        if (!in)
+            return false;
+        std::string line;
+        if (!std::getline(in, line) || line != "CW_SAVE_V1")
+            return false;
+
+        if (!std::getline(in, line))
+            return false;
+        {
+            std::istringstream iss(line);
+            int bell = 0;
+            if (!(iss >> meta.difficultyChoice >> meta.elapsedSeconds >> bell))
+                return false;
+            meta.hardBellPlayed = (bell != 0);
+        }
+
+        if (!std::getline(in, line))
+            return false;
+        {
+            std::istringstream iss(line);
+            if (!(iss >> state.score >> state.hintsUsed >> state.currentStreak))
+                return false;
+        }
+
+        if (!std::getline(in, line))
+            return false;
+        int gridRows = std::stoi(line);
+        state.solutionGrid.clear();
+        for (int i = 0; i < gridRows; i++)
+        {
+            if (!std::getline(in, line))
+                return false;
+            state.solutionGrid.push_back(line);
+        }
+
+        if (!std::getline(in, line))
+            return false;
+        {
+            std::istringstream iss(line);
+            int rows = 0, cols = 0;
+            if (!(iss >> rows >> cols))
+                return false;
+            state.numbering.assign(rows, std::vector<int>(cols, 0));
+            for (int r = 0; r < rows; r++)
+            {
+                if (!std::getline(in, line))
+                    return false;
+                std::istringstream rowStream(line);
+                for (int c = 0; c < cols; c++)
+                    rowStream >> state.numbering[r][c];
+            }
+        }
+
+        if (!std::getline(in, line))
+            return false;
+        int clueCount = std::stoi(line);
+        state.clues.clear();
+        for (int i = 0; i < clueCount; i++)
+        {
+            if (!std::getline(in, line))
+                return false;
+            std::stringstream ss(line);
+            std::string a, b, c, d, e, f;
+            std::getline(ss, a, '|');
+            std::getline(ss, b, '|');
+            std::getline(ss, c, '|');
+            std::getline(ss, d, '|');
+            std::getline(ss, e, '|');
+            std::getline(ss, f);
+            state.clues.push_back(
+                {std::stoi(a), intToDirection(std::stoi(b)), c, f, std::stoi(d), std::stoi(e)});
+        }
+
+        if (!std::getline(in, line))
+            return false;
+        int bankCount = std::stoi(line);
+        state.wordBank.clear();
+        for (int i = 0; i < bankCount; i++)
+        {
+            if (!std::getline(in, line))
+                return false;
+            state.wordBank.push_back(line);
+        }
+
+        if (!std::getline(in, line))
+            return false;
+        int remainingCount = std::stoi(line);
+        state.remainingWords.clear();
+        for (int i = 0; i < remainingCount; i++)
+        {
+            if (!std::getline(in, line))
+                return false;
+            state.remainingWords.insert(line);
+        }
+
+        if (!std::getline(in, line))
+            return false;
+        int solvedCount = std::stoi(line);
+        state.solvedByKey.clear();
+        for (int i = 0; i < solvedCount; i++)
+        {
+            if (!std::getline(in, line))
+                return false;
+            std::stringstream ss(line);
+            std::string num, dir, word;
+            std::getline(ss, num, '|');
+            std::getline(ss, dir, '|');
+            std::getline(ss, word);
+            state.solvedByKey[{std::stoi(num), intToDirection(std::stoi(dir))}] = word;
+        }
+        return true;
     }
 
-    if (!std::getline(in, line)) return false;
-    int remainingCount = std::stoi(line);
-    state.remainingWords.clear();
-    for (int i = 0; i < remainingCount; i++) {
-        if (!std::getline(in, line)) return false;
-        state.remainingWords.insert(line);
+    void printScrollIntro()
+    {
+        printTitleScreen();
+        sleepMs(500);
+        std::cout << Color::YELLOW;
+        std::cout << "\nAn ancient parchment map unfurls before your eyes...\n";
+        std::cout << "Mysterious clues emerge from the crumbling scrolls...\n";
+        std::cout << "The Crossword of the Ancient Scrolls awaits!\n";
+        std::cout << Color::RESET << "\n";
+        sleepMs(500);
     }
 
-    if (!std::getline(in, line)) return false;
-    int solvedCount = std::stoi(line);
-    state.solvedByKey.clear();
-    for (int i = 0; i < solvedCount; i++) {
-        if (!std::getline(in, line)) return false;
-        std::stringstream ss(line);
-        std::string num, dir, word;
-        std::getline(ss, num, '|');
-        std::getline(ss, dir, '|');
-        std::getline(ss, word);
-        state.solvedByKey[{std::stoi(num), intToDirection(std::stoi(dir))}] = word;
+    void printRules(const DifficultyConfig &cfg)
+    {
+        printSeparator();
+        std::cout << Color::MAGENTA << Color::BOLD;
+        std::cout << "=== " << cfg.name << " Mode ===\n";
+        std::cout << Color::RESET;
+        std::cout << "Theme: " << cfg.theme << "\n";
+        std::cout << "Grid: " << cfg.gridSize << "x" << cfg.gridSize << "\n";
+        if (cfg.timeLimitSec > 0)
+            std::cout << "Time Limit: " << cfg.timeLimitSec / 60 << " minute(s)\n";
+        else
+            std::cout << "Time Limit: None\n";
+        if (cfg.unlimitedHints)
+            std::cout << "Hints: Unlimited\n";
+        else
+            std::cout << "Hints: " << cfg.maxHints << "\n";
+        std::cout << "Base points/word: " << cfg.basePointsPerWord << "\n";
+        printSeparator();
     }
-    return true;
-}
 
-void printScrollIntro() {
-    std::cout << "\n===========================================\n";
-    std::cout << "      ~ Ancient Scroll Terminal Boots ~\n";
-    std::cout << "=============================================\n";
-    std::cout << "A parchment map unfurls... clues emerge...\n";
-    std::cout << "Crossword glyphs fade into view.\n\n";
-}
-
-// Displays game rules for the selected difficulty
-// cfg difficulty configuration struct
-void printRules(const DifficultyConfig &cfg) {
-    std::cout << "\n=== " << cfg.name << " Mode ===\n";
-    std::cout << "Theme: " << cfg.theme << "\n";
-    std::cout << "Grid: " << cfg.gridSize << "x" << cfg.gridSize << "\n";
-    if (cfg.timeLimitSec > 0) std::cout << "Time Limit: " << cfg.timeLimitSec / 60 << " minute(s)\n";
-    else std::cout << "Time Limit: None\n";
-    if (cfg.unlimitedHints) std::cout << "Hints: Unlimited\n";
-    else std::cout << "Hints: " << cfg.maxHints << "\n";
-    std::cout << "Base points/word: " << cfg.basePointsPerWord << "\n";
-}
-
-// Prints all clues separated into Across and Down sections
-// clues vector of Clue objects
-void printClues(const std::vector<Clue> &clues) {
-    std::vector<Clue> across, down;
-    for (const auto &c : clues) {
-        if (c.direction == Direction::Across) across.push_back(c);
-        else down.push_back(c);
+    void printClues(const std::vector<Clue> &clues)
+    {
+        std::vector<Clue> across, down;
+        for (const auto &c : clues)
+        {
+            if (c.direction == Direction::Across)
+                across.push_back(c);
+            else
+                down.push_back(c);
+        }
+        std::sort(across.begin(), across.end(), [](const Clue &a, const Clue &b)
+                  { return a.number < b.number; });
+        std::sort(down.begin(), down.end(), [](const Clue &a, const Clue &b)
+                  { return a.number < b.number; });
+        std::cout << "\nAcross:\n";
+        for (const auto &c : across)
+            std::cout << "  " << c.number << ". " << c.clueText << " (" << c.answer.size() << ")\n";
+        std::cout << "Down:\n";
+        for (const auto &c : down)
+            std::cout << "  " << c.number << ". " << c.clueText << " (" << c.answer.size() << ")\n";
     }
-    std::sort(across.begin(), across.end(), [](const Clue &a, const Clue &b) { return a.number < b.number; });
-    std::sort(down.begin(), down.end(), [](const Clue &a, const Clue &b) { return a.number < b.number; });
-    std::cout << "\nAcross:\n";
-    for (const auto &c : across) std::cout << "  " << c.number << ". " << c.clueText << " (" << c.answer.size() << ")\n";
-    std::cout << "Down:\n";
-    for (const auto &c : down) std::cout << "  " << c.number << ". " << c.clueText << " (" << c.answer.size() << ")\n";
-}
 
-// Displays the word bank with remaining unsolved words
-// parameter- remaining set of strings (words not yet guessed)
-void printWordBank(const std::set<std::string> &remaining) {
-    std::cout << "\nWord Bank (" << remaining.size() << " remaining):\n";
-    int cnt = 0;
-    for (const auto &w : remaining) {
-        std::cout << std::setw(14) << std::left << w;
-        cnt++;
-        if (cnt % 5 == 0) std::cout << "\n";
+    void printWordBank(const std::set<std::string> &remaining)
+    {
+        std::cout << "\nWord Bank (" << remaining.size() << " remaining):\n";
+        int cnt = 0;
+        for (const auto &w : remaining)
+        {
+            std::cout << std::setw(14) << std::left << w;
+            cnt++;
+            if (cnt % 5 == 0)
+                std::cout << "\n";
+        }
+        if (cnt % 5 != 0)
+            std::cout << "\n";
     }
-    if (cnt % 5 != 0) std::cout << "\n";
-}
 
-// Checks if a specific grid cell is filled with a solved letter
-// state current GameState object
-// row row index (0 to n-1)
-// col column index (0 to n-1)
-// outCh output parameter - gets the letter if solved
-// return true if cell has been solved, false otherwise
-bool isCellSolved(const GameState &state, int row, int col, char &outCh) {
-    outCh = '_';
-    for (const auto &entry : state.solvedByKey) {
-        int num = entry.first.first;
-        Direction d = entry.first.second;
-        const std::string &word = entry.second;
-        for (const auto &cl : state.clues) {
-            if (cl.number != num || cl.direction != d) continue;
-            int dr = (d == Direction::Across ? 0 : 1);
-            int dc = (d == Direction::Across ? 1 : 0);
-            for (int i = 0; i < static_cast<int>(word.size()); i++) {
-                int rr = cl.row + dr * i;
-                int cc = cl.col + dc * i;
-                if (rr == row && cc == col) {
-                    outCh = word[i];
-                    return true;
+    bool isCellSolved(const GameState &state, int row, int col, char &outCh)
+    {
+        outCh = '_';
+        for (const auto &entry : state.solvedByKey)
+        {
+            int num = entry.first.first;
+            Direction d = entry.first.second;
+            const std::string &word = entry.second;
+            for (const auto &cl : state.clues)
+            {
+                if (cl.number != num || cl.direction != d)
+                    continue;
+                int dr = (d == Direction::Across ? 0 : 1);
+                int dc = (d == Direction::Across ? 1 : 0);
+                for (int i = 0; i < static_cast<int>(word.size()); i++)
+                {
+                    int rr = cl.row + dr * i;
+                    int cc = cl.col + dc * i;
+                    if (rr == row && cc == col)
+                    {
+                        outCh = word[i];
+                        return true;
+                    }
                 }
             }
         }
+        return false;
     }
-    return false;
-}
 
-// Prints the player's current view (solved letters shown, unsolved as '_')
-// state current GameState object
-void printPlayerView(const GameState &state) {
-    int n = static_cast<int>(state.solutionGrid.size());
-    std::cout << "\nCurrent Puzzle:\n   ";
-    for (int c = 0; c < n; c++) std::cout << std::setw(3) << c;
-    std::cout << "\n";
-    for (int r = 0; r < n; r++) {
-        std::cout << std::setw(3) << r;
-        for (int c = 0; c < n; c++) {
-            if (state.solutionGrid[r][c] == '#') {
-                std::cout << "  #";
-            } else {
-                char out = '_';
-                bool solved = isCellSolved(state, r, c, out);
-                std::cout << "  " << (solved ? out : '_');
+    void printPlayerView(const GameState &state)
+    {
+        int n = static_cast<int>(state.solutionGrid.size());
+        std::cout << "\nCurrent Puzzle:\n   ";
+        for (int c = 0; c < n; c++)
+            std::cout << std::setw(3) << c;
+        std::cout << "\n";
+        for (int r = 0; r < n; r++)
+        {
+            std::cout << std::setw(3) << r;
+            for (int c = 0; c < n; c++)
+            {
+                if (state.solutionGrid[r][c] == '#')
+                {
+                    std::cout << "  #";
+                }
+                else
+                {
+                    char out = '_';
+                    bool solved = isCellSolved(state, r, c, out);
+                    std::cout << "  " << (solved ? out : '_');
+                }
+            }
+            std::cout << "\n";
+        }
+        std::cout << "\nCell numbering (start cells):\n";
+        for (int r = 0; r < n; r++)
+        {
+            for (int c = 0; c < n; c++)
+            {
+                if (state.numbering[r][c] == 0)
+                    continue;
+                std::cout << "[" << state.numbering[r][c] << "@(" << r << "," << c << ")] ";
             }
         }
         std::cout << "\n";
     }
-    std::cout << "\nCell numbering (start cells):\n";
-    for (int r = 0; r < n; r++) {
-        for (int c = 0; c < n; c++) {
-            if (state.numbering[r][c] == 0) continue;
-            std::cout << "[" << state.numbering[r][c] << "@(" << r << "," << c << ")] ";
-        }
-    }
-    std::cout << "\n";
-}
 
-// prints final solution grid at end
-void printSolutionGrid(const GameState &state) {
-    int n = static_cast<int>(state.solutionGrid.size());
-    std::cout << "\n=== Final Board (Solution) ===\n\nGrid:\n   ";
-    for (int c = 0; c < n; c++) std::cout << std::setw(3) << c;
-    std::cout << "\n";
-    for (int r = 0; r < n; r++) {
-        std::cout << std::setw(3) << r;
-        for (int c = 0; c < n; c++) {
-            char ch = state.solutionGrid[r][c];
-            if (ch == '#') std::cout << "  #";
-            else std::cout << "  " << ch;
-        }
+    void printSolutionGrid(const GameState &state)
+    {
+        int n = static_cast<int>(state.solutionGrid.size());
+        std::cout << "\n=== Final Board (Solution) ===\n\nGrid:\n   ";
+        for (int c = 0; c < n; c++)
+            std::cout << std::setw(3) << c;
         std::cout << "\n";
+        for (int r = 0; r < n; r++)
+        {
+            std::cout << std::setw(3) << r;
+            for (int c = 0; c < n; c++)
+            {
+                char ch = state.solutionGrid[r][c];
+                if (ch == '#')
+                    std::cout << "  #";
+                else
+                    std::cout << "  " << ch;
+            }
+            std::cout << "\n";
+        }
     }
-}
 } // namespace
 
-
-// Constructor - initializes the crossword game
-// savePath file path for saving/loading game progress
 CrosswordGame::CrosswordGame(const std::string &savePath)
     : savePath_(savePath),
       difficultyChoice_(1),
       loadedElapsedSeconds_(0),
-      hardBellPlayed_(false) {
+      hardBellPlayed_(false)
+{
     state_.reset(new GameState());
 }
 
-// main loop that runs it
-void CrosswordGame::run() {
+void CrosswordGame::run()
+{
     printScrollIntro();
     std::cout << "App 5: Crossword (Anshika)\n";
-    if (!tryLoadGame()) {
-        if (!startNewGame()) return;
+    if (!tryLoadGame())
+    {
+        if (!startNewGame())
+            return;
     }
     printRules(cfg_);
     printClues(state_->clues);
@@ -355,17 +405,19 @@ void CrosswordGame::run() {
     std::cout << "Game over.\n";
 }
 
-//loading prev solved game
-bool CrosswordGame::tryLoadGame() {
+bool CrosswordGame::tryLoadGame()
+{
     SaveMeta meta;
     GameState loaded;
-    if (!loadGame(savePath_, meta, loaded)) return false;
+    if (!loadGame(savePath_, meta, loaded))
+        return false;
 
     std::cout << "Saved game found. Type 'yes' to continue saved game: ";
     std::string ans;
     std::getline(std::cin, ans);
     ans = toUpper(trim(ans));
-    if (ans != "YES" && ans != "Y") return false;
+    if (ans != "YES" && ans != "Y")
+        return false;
 
     difficultyChoice_ = meta.difficultyChoice;
     cfg_ = getConfig(difficultyChoice_);
@@ -377,24 +429,26 @@ bool CrosswordGame::tryLoadGame() {
     return true;
 }
 
-
-//start new with selected diff level
-bool CrosswordGame::startNewGame() {
+bool CrosswordGame::startNewGame()
+{
     std::cout << "Choose Level:\n";
     std::cout << "  1) Easy\n";
     std::cout << "  2) Medium\n";
     std::cout << "  3) Hard\n";
     std::cout << "Enter choice: " << std::flush;
 
-    if (!(std::cin >> difficultyChoice_)) return false;
+    if (!(std::cin >> difficultyChoice_))
+        return false;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    if (difficultyChoice_ < 1 || difficultyChoice_ > 3) difficultyChoice_ = 1;
+    if (difficultyChoice_ < 1 || difficultyChoice_ > 3)
+        difficultyChoice_ = 1;
 
     cfg_ = getConfig(difficultyChoice_);
     auto raw = getRawByDifficulty(difficultyChoice_);
     std::vector<std::string> solution;
     std::vector<Clue> clues;
-    if (!buildCrossword(cfg_.gridSize, raw, solution, clues)) {
+    if (!buildCrossword(cfg_.gridSize, raw, solution, clues))
+    {
         std::cout << "Failed to generate crossword. Please retry.\n";
         return false;
     }
@@ -403,7 +457,8 @@ bool CrosswordGame::startNewGame() {
     state_->solutionGrid = solution;
     state_->clues = clues;
     state_->numbering = buildNumbering(solution);
-    for (const auto &cl : clues) {
+    for (const auto &cl : clues)
+    {
         state_->wordBank.push_back(cl.answer);
         state_->remainingWords.insert(cl.answer);
     }
@@ -416,41 +471,42 @@ bool CrosswordGame::startNewGame() {
     return true;
 }
 
-// Calculates seconds left before time runs out
-// return seconds remaining, or large number if no time limit
-int CrosswordGame::secondsRemaining() const {
-    if (cfg_.timeLimitSec <= 0) return std::numeric_limits<int>::max();
+int CrosswordGame::secondsRemaining() const
+{
+    if (cfg_.timeLimitSec <= 0)
+        return std::numeric_limits<int>::max();
     auto now = std::chrono::steady_clock::now();
     int elapsed = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(now - startTime_).count());
     return cfg_.timeLimitSec - elapsed;
 }
 
-// Checks if all crossword clues have been solved
-// return true if no words left in remainingWords set
 bool CrosswordGame::isSolved() const { return state_->remainingWords.empty(); }
 
-// Finds a clue by its number and direction
-// clue number (e.g., 1, 2, 3...) d Across or Down direction
-// return pointer to Clue if found, nullptr otherwise
-const Clue *CrosswordGame::findClue(int number, Direction d) const {
-    for (const auto &cl : state_->clues) {
-        if (cl.number == number && cl.direction == d) return &cl;
+const Clue *CrosswordGame::findClue(int number, Direction d) const
+{
+    for (const auto &cl : state_->clues)
+    {
+        if (cl.number == number && cl.direction == d)
+            return &cl;
     }
     return nullptr;
 }
 
-// Picks a random unsolved clue and reveals one random letter
-// return true if a hint was revealed, false if all solved
-bool CrosswordGame::revealOneLetter() {
+bool CrosswordGame::revealOneLetter()
+{
     std::vector<std::pair<int, Direction>> unsolved;
-    for (const auto &cl : state_->clues) {
-        if (!state_->solvedByKey.count({cl.number, cl.direction})) unsolved.push_back({cl.number, cl.direction});
+    for (const auto &cl : state_->clues)
+    {
+        if (!state_->solvedByKey.count({cl.number, cl.direction}))
+            unsolved.push_back({cl.number, cl.direction});
     }
-    if (unsolved.empty()) return false;
+    if (unsolved.empty())
+        return false;
     std::uniform_int_distribution<int> dist(0, static_cast<int>(unsolved.size()) - 1);
     auto pick = unsolved[dist(globalRng())];
     const Clue *cl = findClue(pick.first, pick.second);
-    if (!cl) return false;
+    if (!cl)
+        return false;
 
     std::uniform_int_distribution<int> ldist(0, static_cast<int>(cl->answer.size()) - 1);
     int idx = ldist(globalRng());
@@ -458,26 +514,33 @@ bool CrosswordGame::revealOneLetter() {
               << " has letter '" << cl->answer[idx] << "' at position " << (idx + 1) << ".\n";
     return true;
 }
-//hint command
-void CrosswordGame::processHint() {
+
+void CrosswordGame::processHint()
+{
     bool canHint = cfg_.unlimitedHints || state_->hintsUsed < cfg_.maxHints;
-    if (!canHint) {
+    if (!canHint)
+    {
         std::cout << "No hints remaining.\n";
         return;
     }
-    if (revealOneLetter()) state_->hintsUsed++;
-    else std::cout << "No hint available.\n";
+    if (revealOneLetter())
+        state_->hintsUsed++;
+    else
+        std::cout << "No hint available.\n";
 }
 
-//solve command
-void CrosswordGame::processSolve() {
+void CrosswordGame::processSolve()
+{
     std::cout << "Enter clue number: " << std::flush;
     std::string numS;
     std::getline(std::cin, numS);
     int number = 0;
-    try {
+    try
+    {
         number = std::stoi(trim(numS));
-    } catch (...) {
+    }
+    catch (...)
+    {
         std::cout << "Invalid clue number.\n";
         return;
     }
@@ -486,17 +549,20 @@ void CrosswordGame::processSolve() {
     std::string dirS;
     std::getline(std::cin, dirS);
     dirS = toUpper(trim(dirS));
-    if (dirS.empty() || (dirS[0] != 'A' && dirS[0] != 'D')) {
+    if (dirS.empty() || (dirS[0] != 'A' && dirS[0] != 'D'))
+    {
         std::cout << "Invalid direction.\n";
         return;
     }
     Direction dir = (dirS[0] == 'A' ? Direction::Across : Direction::Down);
     const Clue *cl = findClue(number, dir);
-    if (!cl) {
+    if (!cl)
+    {
         std::cout << "No such clue with that direction.\n";
         return;
     }
-    if (state_->solvedByKey.count({number, dir})) {
+    if (state_->solvedByKey.count({number, dir}))
+    {
         std::cout << "That clue is already solved.\n";
         return;
     }
@@ -505,54 +571,67 @@ void CrosswordGame::processSolve() {
     std::string word;
     std::getline(std::cin, word);
     word = normalizeWord(word);
-    if (word.empty()) {
+    if (word.empty())
+    {
         std::cout << "Invalid word input.\n";
         return;
     }
-    if (!state_->remainingWords.count(word)) {
+    if (!state_->remainingWords.count(word))
+    {
         std::cout << "Word not available in remaining bank.\n";
         return;
     }
 
-    if (word == cl->answer) {
+    if (word == cl->answer)
+    {
         state_->solvedByKey[{cl->number, cl->direction}] = cl->answer;
         state_->remainingWords.erase(cl->answer);
         state_->score += cfg_.basePointsPerWord;
         state_->currentStreak++;
         if (cfg_.streakBonus && state_->currentStreak > 0 &&
-            state_->currentStreak % cfg_.streakThreshold == 0) {
+            state_->currentStreak % cfg_.streakThreshold == 0)
+        {
             state_->score += cfg_.streakBonusValue;
             std::cout << "Streak bonus! +" << cfg_.streakBonusValue << " points.\n";
         }
-        std::cout << "Correct! Word placed.\n";
-    } else {
-        if (cfg_.wrongGuessPenalty > 0) state_->score -= cfg_.wrongGuessPenalty;
+        std::cout << Color::GREEN << "Correct! Word placed. +" << cfg_.basePointsPerWord << " points" << Color::RESET << "\n";
+    }
+    else
+    {
+        if (cfg_.wrongGuessPenalty > 0)
+            state_->score -= cfg_.wrongGuessPenalty;
         state_->currentStreak = 0;
-        std::cout << "Incorrect match.\n";
+        std::cout << Color::RED << "Incorrect match." << Color::RESET << "\n";
     }
 }
 
-//save current game status
-void CrosswordGame::saveCurrentGame() const {
+void CrosswordGame::saveCurrentGame() const
+{
     SaveMeta meta;
     meta.difficultyChoice = difficultyChoice_;
     meta.elapsedSeconds = static_cast<int>(
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - startTime_).count());
     meta.hardBellPlayed = hardBellPlayed_;
-    if (saveGame(savePath_, meta, *state_)) std::cout << "Game saved to " << savePath_ << "\n";
-    else std::cout << "Could not save game.\n";
+    if (saveGame(savePath_, meta, *state_))
+        std::cout << "Game saved to " << savePath_ << "\n";
+    else
+        std::cout << "Could not save game.\n";
 }
 
-// Main gameplay loop (input and move processing)
-void CrosswordGame::gameLoop() {
-    while (true) {
+void CrosswordGame::gameLoop()
+{
+    while (true)
+    {
         int remain = secondsRemaining();
-        if (cfg_.timeLimitSec > 0) {
-            if (remain <= 0) {
+        if (cfg_.timeLimitSec > 0)
+        {
+            if (remain <= 0)
+            {
                 std::cout << "\nTime's up! The ancient hourglass is empty.\n";
                 break;
             }
-            if (cfg_.finalMinuteBell && remain <= 60 && !hardBellPlayed_) {
+            if (cfg_.finalMinuteBell && remain <= 60 && !hardBellPlayed_)
+            {
                 std::cout << "\a[Temple Bell] Final minute begins!\n";
                 hardBellPlayed_ = true;
             }
@@ -561,12 +640,17 @@ void CrosswordGame::gameLoop() {
 
         printPlayerView(*state_);
         printWordBank(state_->remainingWords);
-        std::cout << "Score: " << state_->score << " | Hints used: " << state_->hintsUsed;
-        if (cfg_.streakBonus) std::cout << " | Current streak: " << state_->currentStreak;
+        std::cout << Color::YELLOW << "Score: " << state_->score << Color::RESET
+                  << " | Hints used: " << state_->hintsUsed;
+        if (cfg_.streakBonus)
+            std::cout << " | Current streak: " << state_->currentStreak;
         std::cout << "\n";
 
-        if (isSolved()) {
-            std::cout << "\nAll clues solved! The relic vault opens.\n";
+        if (isSolved())
+        {
+            printSeparator();
+            celebrate();
+            printSeparator();
             break;
         }
 
@@ -581,39 +665,53 @@ void CrosswordGame::gameLoop() {
         std::string cmd;
         std::getline(std::cin, cmd);
         cmd = toUpper(trim(cmd));
-        if (cmd == "QUIT") {
+        if (cmd == "QUIT")
+        {
             std::cout << "You leave the ruins for now.\n";
             saveCurrentGame();
             break;
-        } else if (cmd == "CLUES") {
+        }
+        else if (cmd == "CLUES")
+        {
             printClues(state_->clues);
-        } else if (cmd == "HINT") {
+        }
+        else if (cmd == "HINT")
+        {
             processHint();
-        } else if (cmd == "SOLVE") {
+        }
+        else if (cmd == "SOLVE")
+        {
             processSolve();
-        } else if (cmd == "SAVE") {
+        }
+        else if (cmd == "SAVE")
+        {
             saveCurrentGame();
-        } else {
+        }
+        else
+        {
             std::cout << "Unknown command.\n";
         }
     }
 }
 
-//final score after everything
-void CrosswordGame::applyFinalScoring() {
+void CrosswordGame::applyFinalScoring()
+{
     int remain = secondsRemaining();
-    if (cfg_.timeLimitSec > 0 && remain > 0 && isSolved()) {
+    if (cfg_.timeLimitSec > 0 && remain > 0 && isSolved())
+    {
         int bonus = remain * cfg_.finishTimeBonusFactor;
         state_->score += bonus;
         std::cout << "Time bonus: +" << bonus << "\n";
     }
-    if (difficultyChoice_ == 2 && state_->hintsUsed > 0) {
+    if (difficultyChoice_ == 2 && state_->hintsUsed > 0)
+    {
         int reductionPercent = std::min(90, state_->hintsUsed * cfg_.hintPenaltyValue);
         int reduceBy = (state_->score * reductionPercent) / 100;
         state_->score -= reduceBy;
         std::cout << "Hint penalty: -" << reductionPercent << "% (" << reduceBy << " points)\n";
     }
-    if (difficultyChoice_ == 3 && state_->hintsUsed > 0) {
+    if (difficultyChoice_ == 3 && state_->hintsUsed > 0)
+    {
         state_->score -= cfg_.hintPenaltyValue;
         std::cout << "Sacred hint penalty: -" << cfg_.hintPenaltyValue << " points\n";
     }
