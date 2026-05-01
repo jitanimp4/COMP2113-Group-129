@@ -7,14 +7,22 @@
 #include <tuple>
 
 namespace {
+
+// Returns a seeded random number generator
+// @return reference to static mt19937 RNG
 std::mt19937 &globalRng() {
     static std::mt19937 rng(
         static_cast<unsigned>(std::chrono::steady_clock::now().time_since_epoch().count()));
     return rng;
 }
 
+// Checks if coordinates (r,c) are inside an n x n grid
+// return true if in bounds, false otherwise
 bool inBounds(int r, int c, int n) { return r >= 0 && c >= 0 && r < n && c < n; }
 
+// Removes non-letters and converts to uppercase
+// s input string
+// return cleaned string with only A-Z
 std::string normalizeWord(const std::string &s) {
     std::string out;
     for (char c : s) {
@@ -25,6 +33,9 @@ std::string normalizeWord(const std::string &s) {
     return out;
 }
 
+// Attempts to place a word on the grid at given position
+// parameters: grid reference to the crossword grid, r starting row, c starting column, d Across or Down direction, word the word to place
+// return true if placement successful (no conflicts)
 bool placeWord(std::vector<std::string> &grid, int r, int c, Direction d, const std::string &word) {
     int n = static_cast<int>(grid.size());
     int dr = (d == Direction::Across ? 0 : 1);
@@ -45,6 +56,8 @@ bool placeWord(std::vector<std::string> &grid, int r, int c, Direction d, const 
     return true;
 }
 
+// Returns word list for Easy difficulty
+// return vector of RawItem (wonders & landmarks theme)
 std::vector<RawItem> easyRaw() {
     return {
         {"PYRAMID", "Ancient wonder in Giza"},
@@ -57,6 +70,8 @@ std::vector<RawItem> easyRaw() {
         {"MACHU", "Peruvian mountain citadel (short form)"}};
 }
 
+// Returns word list for Medium difficulty
+// return vector of RawItem (art & masterpieces theme)
 std::vector<RawItem> mediumRaw() {
     return {
         {"DAVINCI", "Man who painted the Mona Lisa"},
@@ -71,6 +86,8 @@ std::vector<RawItem> mediumRaw() {
         {"OPERA", "Dramatic art with music"}};
 }
 
+// Returns word list for Hard difficulty
+// return vector of RawItem (historical figures theme)
 std::vector<RawItem> hardRaw() {
     return {
         {"PICASSO", "Cubist co-founder who painted Guernica"},
@@ -90,6 +107,9 @@ std::vector<RawItem> hardRaw() {
         {"TESLA", "Inventor tied to AC systems"}};
 }
 
+// Filters out words shorter than 3 letters and normalizes case
+// raw original word list
+// return cleaned vector of valid words
 std::vector<RawItem> sanitizeRaw(const std::vector<RawItem> &raw) {
     std::vector<RawItem> cleaned;
     for (auto item : raw) {
@@ -103,6 +123,9 @@ std::vector<RawItem> sanitizeRaw(const std::vector<RawItem> &raw) {
 }
 } // namespace
 
+
+// Returns difficulty configuration based on user choice
+// return DifficultyConfig struct with all game settings
 DifficultyConfig getConfig(int choice) {
     if (choice == 1) {
         return {"Easy", "Wonders & Landmarks", 7, 0, 0, 8, 100, 0, true, false, 0, 0, false, 0, 0, 0};
@@ -114,12 +137,20 @@ DifficultyConfig getConfig(int choice) {
     return {"Hard", "Iconoclasts & Architects", 11, 420, 1, 15, 220, 25, false, false, 150, 1, true, 3, 120, 3};
 }
 
+// Returns word list for selected difficulty level
+// choice 1=Easy, 2=Medium, 3=Hard
+// return vector of RawItem (answer + clue pairs)
 std::vector<RawItem> getRawByDifficulty(int choice) {
     if (choice == 1) return sanitizeRaw(easyRaw());
     if (choice == 2) return sanitizeRaw(mediumRaw());
     return sanitizeRaw(hardRaw());
 }
 
+// Attempts to build a crossword grid by placing words intelligently
+// n grid size (n x n)
+// items list of words and clues to places, solutionGrid output parameter for filled grid
+// placedClues output parameter for clues with positions
+// return true if crossword built successfully within 250 attempts
 bool buildCrossword(
     int n, const std::vector<RawItem> &items, std::vector<std::string> &solutionGrid,
     std::vector<Clue> &placedClues) {
@@ -216,6 +247,8 @@ bool buildCrossword(
     return false;
 }
 
+// Assigns clue numbers to starting cells of words
+// return 2D vector with numbers at word start positions (0 elsewhere)
 std::vector<std::vector<int>> buildNumbering(const std::vector<std::string> &grid) {
     int n = static_cast<int>(grid.size());
     std::vector<std::vector<int>> num(n, std::vector<int>(n, 0));
