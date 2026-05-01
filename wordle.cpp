@@ -1,4 +1,10 @@
 // TimeSlipSyndicate.cpp
+// The Time-Slip Syndicate - An Architectural Wordle Game
+// COMP2113 Project
+//
+// Team Members: Krislyn Mariah Mendonca, Menaka Menon, Anshika Mittal, Arpita Sharma, Anushka Jitani and Miracle.
+// Date: 01/05/2026
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -28,12 +34,36 @@ using namespace chrono;
 // Constants and Enumerations
 // ================================
 
+/**
+ * @enum Difficulty
+ * @brief Game difficulty levels
+ * 
+ * EASY   - 30 seconds per guess, includes hints
+ * MEDIUM - 20 seconds per guess, standard challenge
+ * HARD   - 10 seconds per guess, expert mode, no hints
+ */
 enum Difficulty { EASY, MEDIUM, HARD };
+
+/**
+ * @enum CellState
+ * @brief State of a cell in the Wordle grid
+ * 
+ * EMPTY      - No letter entered yet
+ * CORRECT    - Letter is correct and in correct position (Green)
+ * MISPLACED  - Letter is correct but wrong position (Yellow)
+ * WRONG      - Letter is not in the target word (Gray)
+ */
 enum CellState { EMPTY, CORRECT, MISPLACED, WRONG };
 
+/**
+ * @struct Cell
+ * @brief Represents a single cell in the game grid
+ * 
+ * Contains a character letter and its current state in the game
+ */
 struct Cell {
-    char letter;
-    CellState state;
+    char letter;      ///< The character entered by the player
+    CellState state;  ///< Current state of this cell
 };
 
 // Word banks for different difficulty levels
@@ -56,18 +86,33 @@ const vector<string> HARD_WORDS = {
 // Console Color Class (Cross-platform)
 // ================================
 
+/**
+ * @class ConsoleColor
+ * @brief Handles colored console output across Windows and Linux platforms
+ * 
+ * Uses ANSI escape codes on Linux and SetConsoleTextAttribute on Windows
+ */
 class ConsoleColor {
 private:
 #ifdef _WIN32
-    HANDLE hConsole;
+    HANDLE hConsole;  ///< Windows console handle
 #endif
 public:
+    /**
+     * @brief Constructor - Initializes console handle on Windows
+     * @return None
+     */
     ConsoleColor() {
 #ifdef _WIN32
         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
     }
     
+    /**
+     * @brief Sets the text color for subsequent console output
+     * @param color Integer color code (ANSI color codes or Windows color values)
+     * @return None
+     */
     void setColor(int color) {
 #ifdef _WIN32
         SetConsoleTextAttribute(hConsole, color);
@@ -76,6 +121,10 @@ public:
 #endif
     }
     
+    /**
+     * @brief Resets console text color to default (white/gray)
+     * @return None
+     */
     void reset() {
 #ifdef _WIN32
         SetConsoleTextAttribute(hConsole, 7);
@@ -89,21 +138,40 @@ public:
 // Timer Class
 // ================================
 
+/**
+ * @class Timer
+ * @brief Timer class for tracking time-limited guesses
+ * 
+ * Uses high-resolution chrono for accurate timing
+ */
 class Timer {
 private:
-    steady_clock::time_point startTime;
-    int limit;
-    bool running;
+    steady_clock::time_point startTime;  ///< Time when timer was started
+    int limit;                           ///< Time limit in seconds
+    bool running;                        ///< Whether timer is active
     
 public:
+    /**
+     * @brief Constructor - initializes timer to stopped state
+     * @return None
+     */
     Timer() : limit(0), running(false) {}
     
+    /**
+     * @brief Starts the timer with specified time limit
+     * @param seconds Time limit in seconds
+     * @return None
+     */
     void start(int seconds) {
         limit = seconds;
         startTime = steady_clock::now();
         running = true;
     }
     
+    /**
+     * @brief Gets remaining time on the timer
+     * @return int Number of seconds remaining (0 if expired)
+     */
     int getRemaining() {
         if (!running) return limit;
         auto now = steady_clock::now();
@@ -113,10 +181,18 @@ public:
         return remaining;
     }
     
+    /**
+     * @brief Checks if timer has expired
+     * @return bool True if time is up, false otherwise
+     */
     bool isExpired() {
         return getRemaining() <= 0;
     }
     
+    /**
+     * @brief Stops the timer (remains stopped until start() called again)
+     * @return None
+     */
     void stop() {
         running = false;
     }
@@ -126,19 +202,25 @@ public:
 // Game Class
 // ================================
 
+/**
+ * @class TimeSlipSyndicate
+ * @brief Main game class for The Time-Slip Syndicate
+ * 
+ * Handles game logic, UI rendering, and user input for the Wordle-style game
+ */
 class TimeSlipSyndicate {
 private:
-    string targetWord;
-    vector<vector<Cell>> grid;
-    int currentRow;
-    bool gameWon;
-    bool gameActive;
-    Difficulty difficulty;
-    string currentGuess;
-    Timer guessTimer;
-    int timeLimit;
-    vector<string> wordBank;
-    ConsoleColor console;
+    string targetWord;                    ///< The correct word to guess
+    vector<vector<Cell>> grid;            ///< 6x5 Wordle game grid
+    int currentRow;                       ///< Current row being filled (0-5)
+    bool gameWon;                         ///< Whether player has won
+    bool gameActive;                      ///< Whether game is still active
+    Difficulty difficulty;                ///< Selected difficulty level
+    string currentGuess;                  ///< Current guess being typed
+    Timer guessTimer;                     ///< Timer for current guess
+    int timeLimit;                        ///< Time limit based on difficulty
+    vector<string> wordBank;              ///< Words for selected difficulty
+    ConsoleColor console;                 ///< Console color handler
     
     // Immersive messages for feedback
     const vector<string> successMessages = {
@@ -156,7 +238,14 @@ private:
     };
     
 public:
-    // Constructor - FIXED: Changed 'Diff' to 'Difficulty'
+    /**
+     * @brief Constructor - Initializes game with selected difficulty
+     * @param diff Difficulty level (EASY/MEDIUM/HARD)
+     * @return None
+     * 
+     * Sets time limit, selects random target word from appropriate word bank,
+     * initializes empty grid, and starts the timer.
+     */
     TimeSlipSyndicate(Difficulty diff) : 
         currentRow(0), 
         gameWon(false), 
@@ -198,26 +287,40 @@ public:
         guessTimer.start(timeLimit);
     }
     
-    // Clear screen (cross-platform)
+    /**
+     * @brief Clears the console screen (cross-platform)
+     * @return None
+     * Uses ANSI escape codes on Linux, alternative on Windows
+     */
     void clearScreen() {
         cout << "\033[2J\033[1;1H";
     }
     
-    // Draw the top border
+    /**
+     * @brief Draws the top border of the game interface
+     * @return None
+     */
     void drawTopBorder() {
         console.setColor(36);
         cout << "╔════════════════════════════════════════════════════════════════════════════════╗\n";
         console.reset();
     }
     
-    // Draw bottom border
+    /**
+     * @brief Draws the bottom border of the game interface
+     * @return None
+     */
     void drawBottomBorder() {
         console.setColor(36);
         cout << "╚════════════════════════════════════════════════════════════════════════════════╝\n";
         console.reset();
     }
     
-    // Draw header with system status
+    /**
+     * @brief Draws the header with system status indicators
+     * @return None
+     * Displays [SCANNING], [ONLINE], [SECURE] with flickering scan line effect
+     */
     void drawHeader() {
         console.setColor(36);
         cout << "║  [TEMPORAL ARCHIVE v2.47]";
@@ -241,7 +344,10 @@ public:
         console.reset();
     }
     
-    // Draw side panels with era indicators
+    /**
+     * @brief Draws side panels with era indicators (Classical/Medieval/Modern)
+     * @return None
+     */
     void drawSidePanels() {
         console.setColor(33);
         cout << "║  ┌─────────────┐                                                ║\n";
@@ -257,7 +363,11 @@ public:
         console.reset();
     }
     
-    // Draw the timer
+    /**
+     * @brief Draws the timer and attempt counter in the interface
+     * @return None
+     * Displays countdown timer with visual progress bar (█ for remaining, ░ for elapsed)
+     */
     void drawTimer() {
         int remaining = guessTimer.getRemaining();
         
@@ -284,7 +394,11 @@ public:
         cout << "║\n";
     }
     
-    // Draw the Wordle grid
+    /**
+     * @brief Draws the 6x5 Wordle game grid with color-coded cells
+     * @return None
+     * Grid layout changes based on difficulty (HARD uses compact layout)
+     */
     void drawWordleGrid() {
         for (int row = 0; row < 6; ++row) {
             cout << "║  ";
@@ -393,7 +507,11 @@ public:
         }
     }
     
-    // Draw input area
+    /**
+     * @brief Draws the input area where player types their guess
+     * @return None
+     * Shows current typed letters, hints based on difficulty level
+     */
     void drawInputArea() {
         console.setColor(36);
         cout << "║  ┌────────────────────────────────────────────────────────────────────┐  ║\n";
@@ -435,7 +553,12 @@ public:
         console.reset();
     }
     
-    // Draw status message
+    /**
+     * @brief Draws a status message in the game interface
+     * @param message The text to display
+     * @param color The color code for the message
+     * @return None
+     */
     void drawStatusMessage(const string& message, int color) {
         console.setColor(color);
         cout << "║  ";
@@ -447,7 +570,12 @@ public:
         console.reset();
     }
     
-    // Draw the entire interface
+    /**
+     * @brief Draws the complete game interface
+     * @param statusMsg Optional status message to display (default: empty)
+     * @param statusColor Color for the status message (default: 37 - white)
+     * @return None
+     */
     void drawInterface(const string& statusMsg = "", int statusColor = 37) {
         clearScreen();
         drawTopBorder();
@@ -476,7 +604,15 @@ public:
         drawBottomBorder();
     }
     
-    // Evaluate the current guess
+    /**
+     * @brief Evaluates the player's guess against the target word
+     * @return bool True if the guess was correct (win condition), false otherwise
+     * 
+     * Implements Wordle logic:
+     * - Green: Correct letter, correct position
+     * - Yellow: Correct letter, wrong position
+     * - Gray: Letter not in word
+     */
     bool evaluateGuess() {
         if (currentGuess.length() != 5) {
             drawInterface("INCOMPLETE TEMPORAL DATA - Need 5 letters!", 33);
@@ -551,7 +687,12 @@ public:
         return false;
     }
     
-    // Get keyboard input (cross-platform)
+    /**
+     * @brief Gets a single character from keyboard input without requiring Enter
+     * @return char The key pressed by the user
+     * 
+     * Cross-platform implementation using _getch() on Windows and termios on Linux
+     */
     char getKey() {
 #ifdef _WIN32
         return _getch();
@@ -568,7 +709,10 @@ public:
 #endif
     }
     
-    // Check if key is available
+    /**
+     * @brief Checks if a key is available to read without blocking
+     * @return bool True if a key is in the input buffer, false otherwise
+     */
     bool keyAvailable() {
 #ifdef _WIN32
         return _kbhit();
@@ -592,7 +736,16 @@ public:
 #endif
     }
     
-    // Main game loop
+    /**
+     * @brief Main game loop that runs the game until win/loss
+     * @return None
+     * 
+     * Handles:
+     * - Timer checking and expiration
+     * - Keyboard input processing
+     * - Game state updates
+     * - Display updates
+     */
     void run() {
         drawInterface("Welcome, Time Agent. Decode the historical fragment.", 36);
         this_thread::sleep_for(chrono::milliseconds(2000));
@@ -664,6 +817,13 @@ public:
 // Main Function
 // ================================
 
+/**
+ * @brief Main entry point for the Time-Slip Syndicate game
+ * @return int Returns 0 on successful execution
+ * 
+ * Displays welcome screen, gets difficulty choice, and starts the game.
+ * This function is called runWordleApp() to integrate with the main menu.
+ */
 int runWordleApp() {
     // Setup console
     cout << "\033[2J\033[1;1H";
