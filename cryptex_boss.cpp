@@ -32,7 +32,7 @@ void typeTextColor(string text, int delayMs, string color)
 {
     cout << color;
 
-    for (int i = 0; i < text.length(); i++)
+    for (size_t i = 0; i < text.length(); i++)
     {
         cout << text[i] << flush;
         this_thread::sleep_for(chrono::milliseconds(delayMs));
@@ -98,7 +98,7 @@ void bootSequence()
 //Change to lowercase
 string toLowerCase(string text)
 {
-    for (int i = 0; i < text.length(); i++)
+    for (size_t i = 0; i < text.length(); i++)
     {
         text[i] = tolower((unsigned char)text[i]);
     }
@@ -403,9 +403,9 @@ void runCryptexBoss(string mode)
         hintsLeft = 1;
     }
 
-    if (questions.size() < totalQuestions)
+    if ((int)questions.size() < totalQuestions)
     {
-        totalQuestions = questions.size();
+        totalQuestions = (int)questions.size();
     }
 
     showMascotSleeping();
