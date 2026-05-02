@@ -323,7 +323,7 @@ public:
     }
 };
 
-int main() {
+int runWordleApp() {
     while (true) {
         // Clear screen (simple way)
         for (int i = 0; i < 50; i++) cout << endl;
