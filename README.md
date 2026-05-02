@@ -78,10 +78,10 @@ Architecture & History - A Wordle-style game where players decode 5-letter histo
 ### App 4: Crossword
 **Theme:** Wonders & Landmarks, Art Movements, Iconoclasts  
 
-## Overview
+# Overview
 A terminal-based crossword puzzle game where players solve clues to uncover words from a word bank. The game features multiple difficulty levels, time limits, hint systems, scoring mechanics, and save/load functionality.
 
-## Coding Elements Implementation
+# Coding Elements Implementation
 
 | Requirement | Implementation Location |
 |-------------|------------------------|
@@ -92,7 +92,7 @@ A terminal-based crossword puzzle game where players solve clues to uncover word
 | **Program codes in multiple files** | `main.cpp`, `game.cpp`, `game.h`, `puzzle.cpp`, `puzzle.h`, `art.h` |
 | **Multiple Difficulty Levels** | `getConfig()` in `puzzle.cpp` - Easy, Medium, Hard with different settings |
 
-## Difficulty Levels
+# Difficulty Levels
 
 | Difficulty | Grid Size | Time Limit | Max Hints | Base Points |
 |------------|-----------|------------|-----------|-------------|
@@ -100,7 +100,7 @@ A terminal-based crossword puzzle game where players solve clues to uncover word
 | Medium | 9x9 | 10 minutes | 3 | 150 |
 | Hard | 11x11 | 7 minutes | 1 | 220 |
 
-## How to Play
+# How to Play
 
 1. Run the program and select a difficulty level (1=Easy, 2=Medium, 3=Hard)
 2. View the clues (Across and Down) and the word bank
@@ -110,7 +110,7 @@ A terminal-based crossword puzzle game where players solve clues to uncover word
 6. Use `save` to save progress
 7. Use `quit` to save and exit
 
-## Scoring System
+# Scoring System
 
 | Action | Points |
 |--------|--------|
