@@ -111,17 +111,30 @@ int main()
             wordPyramidDone = true;
             pauseMenu();
         }
-        else if (choice == 2)
+       else if (choice == 2)
         {
-            // [PROJECT REQUIREMENT: Multiple Difficulty Levels]
-            // Prompting the user to select the difficulty level for the Celluloid App.
             int difficulty;
-            cout << "Select difficulty: 1 Easy, 2 Medium, 3 Hard: ";
-            cin >> difficulty;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            
+            // Loop until the user provides valid input
+            while (true) {
+                cout << "Select difficulty: 1 Easy, 2 Medium, 3 Hard: ";
+                cin >> difficulty;
 
-            // [PROJECT REQUIREMENT: Program codes in multiple files]
-            // Instantiating the class defined in celluloid_app.cpp
+                // Check if cin failed (they typed a letter) OR if the number is not 1, 2, or 3
+                if (cin.fail() || difficulty < 1 || difficulty > 3) {
+                    cout << "\033[1;31m [ERROR] Invalid input. Please enter 1, 2, or 3.\033[0m\n";
+                    
+                    // 1. Clear the error state so cin works again
+                    cin.clear(); 
+                    // 2. Throw away the bad input left in the buffer
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+                } else {
+                    // Valid input received! Clear the trailing newline and break the loop.
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    break; 
+                }
+            }
+
             CelluloidApp app(difficulty);
             app.run();
 
