@@ -32,7 +32,7 @@ void typeTextColor(string text, int delayMs, string color)
 {
     cout << color;
 
-    for (size_t i = 0; i < text.length(); i++)
+    for (int i = 0; i < text.length(); i++)
     {
         cout << text[i] << flush;
         this_thread::sleep_for(chrono::milliseconds(delayMs));
@@ -98,12 +98,126 @@ void bootSequence()
 //Change to lowercase
 string toLowerCase(string text)
 {
-    for (size_t i = 0; i < text.length(); i++)
+    for (int i = 0; i < text.length(); i++)
     {
         text[i] = tolower((unsigned char)text[i]);
     }
     return text;
 }
+
+//For whitespace problem
+string trim(const string& str)
+{
+    size_t start = str.find_first_not_of(" \t\n\r");
+    size_t end = str.find_last_not_of(" \t\n\r");
+
+    if (start == string::npos) return "";
+
+    return str.substr(start, end - start + 1);
+}
+
+string normalizeSpaces(const string& str)
+{
+    string result;
+    bool inSpace = false;
+
+    for (char c : str)
+    {
+        if (isspace(c))
+        {
+            if (!inSpace)
+            {
+                result += ' ';
+                inSpace = true;
+            }
+        }
+        else
+        {
+            result += c;
+            inSpace = false;
+        }
+    }
+
+    return result;
+}
+
+string normalizeAnswer(string text)
+{
+    text = toLowerCase(text);
+    text = trim(text);
+    text = normalizeSpaces(text);
+    return text;
+}
+
+//For Multiple answer problem
+vector<string> stopWords = {
+    "the", "a", "an", "of", "in", "on", "at", "to", "for"
+};
+
+vector<string> splitWords(const string& text)
+{
+    vector<string> words;
+    stringstream ss(text);
+    string word;
+
+    while (ss >> word)
+    {
+        words.push_back(word);
+    }
+
+    return words;
+}
+
+bool isStopWord(const string& word)
+{
+    vector<string> stopWords = {
+        "the", "a", "an", "of", "in", "on", "at", "to", "for"
+    };
+
+    for (const string& w : stopWords)
+    {
+        if (word == w) return true;
+    }
+    return false;
+}
+
+bool smartMatch(string user, string correct)
+{
+    user = normalizeAnswer(user);
+    correct = normalizeAnswer(correct);
+
+    vector<string> userWords = splitWords(user);
+    vector<string> correctWords = splitWords(correct);
+
+    int totalKeywords = 0;
+    int matchedKeywords = 0;
+
+    for (const string& word : correctWords)
+    {
+        if (isStopWord(word)) continue;
+
+        totalKeywords++;
+
+        for (const string& u : userWords)
+        {
+            if (u == word)
+            {
+                matchedKeywords++;
+                break;
+            }
+        }
+    }
+
+    // Require at least 70% of keywords to match
+    if (totalKeywords == 0) return false;
+
+    double ratio = (double)matchedKeywords / totalKeywords;
+
+    return ratio >= 0.7;
+}
+
+
+//File Loading errors
 
 vector<TriviaQuestion> loadQuestions(string filename, string mode)
 {
@@ -250,7 +364,7 @@ void showMascotAnimated()
 
 void runCryptexBoss(string mode)
 {
-    mode = toLowerCase(mode);
+    mode = normalizeAnswer(mode);
     vector<TriviaQuestion> questions = loadQuestions("cryptex_questions.txt", mode);
 
     if (questions.size() == 0)
@@ -267,7 +381,7 @@ void runCryptexBoss(string mode)
 
     int lives;
     int score = 0;
-    size_t totalQuestions = 10;
+    int totalQuestions = 10;
     int hintsLeft;
 
     if (mode == "easy")
@@ -350,7 +464,7 @@ void runCryptexBoss(string mode)
         countdown();
     }
 
-    for (size_t i = 0; i < totalQuestions && lives > 0; i++)
+    for (int i = 0; i < totalQuestions && lives > 0; i++)
     {
         time_t now = time(0);
 
@@ -416,7 +530,7 @@ void runCryptexBoss(string mode)
             }
         }
 
-        if (toLowerCase(userAnswer) == toLowerCase(questions[i].answer))
+        if (smartMatch(userAnswer, questions[i].answer))
         {
             cout << endl;
             cout << GREEN << "[ACCESS STABLE] Correct!" << RESET << endl;
