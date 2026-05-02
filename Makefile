@@ -11,7 +11,8 @@ SRC = main.cpp \
       wordle.cpp \
       game.cpp \
       puzzle.cpp \
-      forgers_table.cpp
+      forgers_table.cpp \
+      art.cpp
 
 all: $(TARGET)
 
