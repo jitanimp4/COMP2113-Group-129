@@ -10,7 +10,7 @@
 #include "celluloid_app.h"
 #include "word_pyramid.h"
 #include "game.h"
-#include "forgers_table.h"  // ADD THIS
+#include "forgers_table.h"
 
 using namespace std;
 
@@ -25,7 +25,7 @@ int runWordleApp();
  */
 string toLowerMain(string text)
 {
-    for (int i = 0; i < text.length(); i++)
+    for (size_t i = 0; i < text.length(); i++)
         text[i] = tolower((unsigned char)text[i]);
     return text;
 }
@@ -71,8 +71,8 @@ int main()
     bool wordPyramidDone = false;
     bool directorsArchiveDone = false;
     bool timeSlipDone = false;
-    bool crosswordDone = false;      // ADD THIS
-    bool forgersTableDone = false;   // ADD THIS
+    bool crosswordDone = false;
+    bool forgersTableDone = false;
 
     // Main application loop
     while (true)
@@ -85,7 +85,7 @@ int main()
         cout << "2. The Director's Archive\n";
         cout << "3. The Time-Slip Syndicate\n";
         cout << "4. Crossword\n";
-        cout << "5. The Forger's Table\n";   // ADD THIS
+        cout << "5. The Forger's Table\n";
 
         if (isCryptexUnlocked(wordPyramidDone, directorsArchiveDone, timeSlipDone, crosswordDone, forgersTableDone))
             cout << "6. The Curator's Cryptex\n";
@@ -139,10 +139,10 @@ int main()
             // Note: Ensure "save_data.txt" handling meets the File I/O requirements in game.cpp.
             CrosswordGame game("save_data.txt");
             game.run();
-            crosswordDone = true;   // ADD THIS
+            crosswordDone = true;
             pauseMenu();
         }
-        else if (choice == 5)   // ADD THIS BLOCK
+        else if (choice == 5)
         {
             runForgersTable();
             forgersTableDone = true;
