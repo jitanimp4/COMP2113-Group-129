@@ -251,7 +251,7 @@ void showMascotAnimated()
 void runCryptexBoss(string mode)
 {
     mode = toLowerCase(mode);
-    vector<TriviaQuestion> questions = loadQuestions("data/cryptex_questions.txt", mode);
+    vector<TriviaQuestion> questions = loadQuestions("cryptex_questions.txt", mode);
 
     if (questions.size() == 0)
     {
