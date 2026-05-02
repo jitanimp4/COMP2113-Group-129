@@ -10,11 +10,19 @@ void sleepMs(int ms)
 {
     Sleep(ms);
 }
+void clearScreen()
+{
+    system("cls");
+}
 #else
 #include <unistd.h>
 void sleepMs(int ms)
 {
     usleep(ms * 1000);
+}
+void clearScreen()
+{
+    system("clear");
 }
 #endif
 
