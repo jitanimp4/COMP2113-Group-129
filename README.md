@@ -205,12 +205,100 @@ A terminal-based crossword puzzle game where players solve clues to uncover word
 | Hint penalty (Hard) | -150 points per hint |
 
 
-### App 5: The Forger's Table
+
+
+
+
+##### App 5: The Forger's Table
 **Theme:** Heritage Crimes Investigation  
-**Game Mechanics:**
-- The player identifies falsified fields in artifact dossiers by comparing two records of the same artifact.
-- Difficulty: Intern (Easy), Archivist (Medium), Master Curator (Hard).
-- Multiple fields may be falsified, and players need to spot them under time pressure.
+**Developer:** Anshika Mittal
+
+### Overview
+A terminal-based artifact authentication game. Two classified dossiers appear side by side — one genuine, one tampered by a forger. The player must identify which field(s) have been falsified. Across three difficulty levels the challenge escalates: labels disappear, multiple fields are forged simultaneously, a countdown timer is introduced, and some dossier pairs may be entirely authentic (requiring the player to call it out).
+
+---
+
+### Coding Elements Implementation
+
+| Requirement | Implementation Location |
+|-------------|------------------------|
+| **Generation of random events** | `std::mt19937 g_rng{std::random_device{}()}` seeds the RNG; `std::shuffle` randomises the artifact pool each round in `playRound()`; `std::uniform_int_distribution<int> coin(0,4)` gives a ~20% chance of an authentic (unforged) pair in Master mode — all in `forgers_table.cpp` |
+| **Data structures for storing data** | `struct Artifact` holds an ordered `vector<pair<string,string>>` of fields plus three `vector<ForgedField>` sets (one per difficulty); `struct QResult` stores per-question results for the end-of-round summary; `std::map<string,string>` built inside `displayArtifacts()` for O(1) forged-value lookup — all in `forgers_table.cpp` |
+| **Dynamic memory management** | `std::vector<Artifact> arts` grown dynamically as `loadArtifacts()` parses the file; `pool` vector extended at runtime if the artifact bank is smaller than the question count; `std::thread thr(timerFn); thr.detach()` allocates a background timer thread dynamically in Master mode — all in `forgers_table.cpp` |
+| **File input/output** | `loadArtifacts("forger_bank.txt")` reads the full artifact database line-by-line using `std::ifstream` (input); `saveScore()` appends a timestamped result (difficulty, score, best streak) to `save_data.txt` using `std::ofstream` in append mode (output) — both in `forgers_table.cpp` |
+| **Program codes in multiple files** | `forgers_table.h` (function declaration for `runForgersTable()`), `forgers_table.cpp` (all game logic), `main.cpp` (Odyssey OS menu integration), `forger_bank.txt` (artifact database), `Makefile` |
+| **Multiple Difficulty Levels** | Three levels selectable at runtime — Intern, Archivist, Master Curator — each with different lives, question counts, label visibility, timer presence, and forgery complexity; selected via `selectDifficulty()` and branched throughout `playRound()` in `forgers_table.cpp` |
+
+---
+
+### Difficulty Levels
+
+| Difficulty | Lives | Questions | Field Labels | Forged Fields | Timer | Authentic Pairs |
+|------------|-------|-----------|--------------|---------------|-------|-----------------|
+| Intern (Easy) | 5 | 5 | ✅ Shown | 1 (obvious) | ❌ | No |
+| Archivist (Medium) | 3 | 5 | ❌ Hidden | 1 (subtle) | ❌ | No |
+| Master Curator (Hard) | 2 | 7 | ❌ Hidden | Up to 3 | ✅ 30s | ~20% chance |
+
+---
+
+### Scoring System
+
+| Event | Points |
+|-------|--------|
+| Correct identification | +100 pts |
+| Streak of 3+ correct | ×2 multiplier on all subsequent correct answers |
+| Speed bonus (Master only, answer < 15s) | +50 pts |
+| Life bonus (end of round) | +50 pts per life remaining |
+| Wrong answer or timeout | −1 life, streak reset |
+
+---
+
+### Commands
+
+| Input | Description |
+|-------|-------------|
+| `DATE` / `LOCATION` / `BUILDER` / `MATERIAL` / `STYLE` | Name the forged field (Intern & Archivist) |
+| `FIELD1, FIELD2, ...` | Comma-separated list of forged fields (Master Curator) |
+| `AUTHENTIC` | Declare that no fields are forged — both dossiers are genuine (Master Curator only) |
+| `Q` or `QUIT` | Exit the game at any prompt and return to the Odyssey OS main menu |
+
+---
+
+### How to Play
+
+1. Select a difficulty level from the menu (1 = Intern, 2 = Archivist, 3 = Master Curator).
+2. Two classified dossiers appear side by side — **FILE A** (authentic) and **FILE B** (potentially tampered).
+3. Compare the five fields: **DATE, LOCATION, BUILDER, MATERIAL, STYLE**.
+4. Type the name of the field that has been forged and press ENTER.
+   - In **Master Curator** mode, list all forged fields separated by commas (e.g. `DATE, BUILDER`).
+   - If both dossiers are identical, type `AUTHENTIC`.
+5. Receive feedback — correct answers earn points; wrong answers cost a life.
+6. A historical debriefing note about the artifact is shown after each question.
+7. Finish all questions (or survive on remaining lives) to see the **Case File Summary** with your final score.
+8. Type `Q` at any prompt to return to the main menu immediately.
+
+---
+
+### File Format — `forger_bank.txt`
+
+Each artifact block follows this structure (blocks separated by `===` or a blank line):
+
+```
+NAME: Colosseum
+DATE: 70-80 AD
+LOCATION: Rome, Italy
+BUILDER: Emperor Vespasian
+MATERIAL: Travertine limestone
+STYLE: Roman Imperial
+FACT: The Colosseum could hold up to 80,000 spectators.
+DIFFICULTY: easy
+EASY_FORGE:   DATE=100-120 AD
+MEDIUM_FORGE: BUILDER=Emperor Hadrian
+HARD_FORGE:   DATE=100-120 AD | LOCATION=Naples, Italy | STYLE=Byzantine
+===
+```
+
+
 
 ### App 6: The Curator's Cryptex
 **Theme:** Pop-Quiz Gauntlet (Rapid Fire Trivia)  
