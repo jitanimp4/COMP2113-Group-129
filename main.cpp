@@ -174,7 +174,7 @@ int main()
             cout << "Select Cryptex mode (easy / medium / hard): ";
             getline(cin, mode);
 
-            runCryptexBoss(toLowerMain(mode));
+            runCryptexBoss(mode);
             pauseMenu();
         }
         else
