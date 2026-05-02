@@ -4,6 +4,8 @@
 #include <ctime>
 #include <limits>
 
+// [PROJECT REQUIREMENT: Program codes in multiple files]
+// Including header files to link logic stored in different translation units.
 #include "cryptex_boss.h"
 #include "celluloid_app.h"
 #include "word_pyramid.h"
@@ -11,8 +13,15 @@
 
 using namespace std;
 
+// Forward declaration
 int runWordleApp();
 
+/*
+ * Function: toLowerMain
+ * What it does: Converts a given string entirely to lowercase letters.
+ * What the inputs are: string text (the original string to convert)
+ * What the outputs are: string (the converted lowercase string)
+ */
 string toLowerMain(string text)
 {
     for (int i = 0; i < text.length(); i++)
@@ -20,28 +29,52 @@ string toLowerMain(string text)
     return text;
 }
 
+/*
+ * Function: isCryptexUnlocked
+ * What it does: Checks if all prerequisite games have been completed to unlock the final boss.
+ * What the inputs are: bool game1Done, bool game2Done, bool game3Done (completion status flags)
+ * What the outputs are: bool (true if all games are completed, false otherwise)
+ */
 bool isCryptexUnlocked(bool game1Done, bool game2Done, bool game3Done)
 {
     return game1Done && game2Done && game3Done;
 }
 
+/*
+ * Function: pauseMenu
+ * What it does: Pauses the application flow until the user presses the ENTER key, allowing them to read the screen.
+ * What the inputs are: None
+ * What the outputs are: None (Waits for standard input)
+ */
 void pauseMenu()
 {
+    // [PROJECT REQUIREMENT: File input/output] -> Console I/O
     cout << "\nPress ENTER to return to menu...";
     string temp;
     getline(cin, temp);
 }
 
+/*
+ * Function: main
+ * What it does: The entry point of the program. Manages the main menu UI and routes the user to different game modules.
+ * What the inputs are: None
+ * What the outputs are: int (0 indicating successful program termination)
+ */
 int main()
 {
+    // [PROJECT REQUIREMENT: Generation of random events]
+    // Seeds the legacy random number generator with the current system time.
     srand(time(0));
 
+    // State variables to track game progression
     bool wordPyramidDone = false;
     bool directorsArchiveDone = false;
     bool timeSlipDone = false;
 
+    // Main application loop
     while (true)
     {
+        // Console I/O: Printing the menu
         cout << "\n====================================\n";
         cout << "        ODYSSEY OS MAIN MENU         \n";
         cout << "====================================\n";
@@ -60,6 +93,7 @@ int main()
 
         int choice;
         cin >> choice;
+        // Clears the input buffer to prevent infinite loops on bad input
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         if (choice == 0)
@@ -75,11 +109,15 @@ int main()
         }
         else if (choice == 2)
         {
+            // [PROJECT REQUIREMENT: Multiple Difficulty Levels]
+            // Prompting the user to select the difficulty level for the Celluloid App.
             int difficulty;
             cout << "Select difficulty: 1 Easy, 2 Medium, 3 Hard: ";
             cin >> difficulty;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
+            // [PROJECT REQUIREMENT: Program codes in multiple files]
+            // Instantiating the class defined in celluloid_app.cpp
             CelluloidApp app(difficulty);
             app.run();
 
@@ -94,6 +132,7 @@ int main()
         }
         else if (choice == 4)
         {
+            // Note: Ensure "save_data.txt" handling meets the File I/O requirements in game.cpp.
             CrosswordGame game("save_data.txt");
             game.run();
             pauseMenu();
