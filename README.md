@@ -120,21 +120,11 @@ A terminal-based crossword puzzle game where players solve clues to uncover word
 
 1. Run the program and select a difficulty level (1=Easy, 2=Medium, 3=Hard)
 2. View the clues (Across and Down) and the word bank
-3. Use the `solve` command to guess a word for a clue
-4. Use `hint` to reveal a random letter (costs points on higher difficulties)
-5. Use `clues` to view clues again
+3. Use the `solve` command to guess a word for a clue : Enter clue number, direction (A/D), and word from bank
+4. Use `hint` to reveal a random letter (costs points on higher difficulties) : Reveals one random letter from an unsolved clue
+5. Use `clues` to view clues again 
 6. Use `save` to save progress
 7. Use `quit` to save and exit
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `solve` | Enter clue number, direction (A/D), and word from bank |
-| `hint` | Reveals one random letter from an unsolved clue |
-| `clues` | Displays all clues again |
-| `save` | Saves current game progress |
-| `quit` | Saves and exits the game |
 
 ## Scoring System
 
@@ -147,7 +137,6 @@ A terminal-based crossword puzzle game where players solve clues to uncover word
 | Hint penalty (Medium) | 7% reduction per hint (max 90%) |
 | Hint penalty (Hard) | -150 points per hint |
 
-## File Structure
 
 ### App 5: The Forger's Table
 **Theme:** Heritage Crimes Investigation  
