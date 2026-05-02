@@ -43,12 +43,49 @@ The player interacts with **Odyssey OS**, a system housing encrypted data of his
 ## Mini-Games Overview
 
 ### App 1: Word Pyramids of Giza
-**Theme:** Ancient Ruins & Myths
-**Game Mechanics:**
-- Word Pyramids of Giza is a puzzle mini‑game set in ancient Egypt. The player sees a triangular pyramid of scrambled letters hiding 4–7 historical or mythological words (e.g., gods, empires, rulers). By typing valid words from the letter pool, the letters are removed from the pyramid. The goal is to uncover all hidden words before the timer runs out (optional). The game includes a clear reset and a hint system (max 3 hints).
-- Categories include Easy) Gods, Monsters, and Myths, (Medium) Empires, Innovation, Monuments, (Hard) Rulers, Pharaohs, and Heros.
-- Players must find words from a letter pool to complete the pyramid.
-- Difficulty: Easy, Medium, Hard.
+### App 1: Word Pyramids of Giza
+# Overview
+A terminal-based word pyramid puzzle where letters are arranged in a triangular formation. Players must identify and guess all hidden words using only the letters shown in the pyramid. The game features multiple difficulty levels with different historical and mythological categories, a hint system, a clear/reset function, and file-based word banks.
+
+# Coding Elements Implementation
+
+| Requirement | Implementation Location |
+|-------------|------------------------|
+| **Generation of random events** | `WordPyramidGame()` constructor seeds `mt19937` with `random_device`; `generatePuzzlesFromWordBank()` randomly selects word subsets; `initialize()` randomly picks a puzzle from difficulty bank; `processHint()` randomly chooses an unguessed target word; `std::shuffle` randomises letter order in pyramid (all in `word_pyramid.cpp`) |
+| **Data structures for storing data** | `struct PuzzleState` in `word_pyramid.h` (holds `vector<string> targetWords`, `vector<bool> correctlyGuessed`, `vector<string> guessedWords`, `vector<char>` letter pools, `int` metadata); `vector<vector<string>> easyPuzzles`, `mediumPuzzles`, `hardPuzzles` in `WordPyramidGame` class |
+| **Dynamic memory management** | `activePuzzle = new PuzzleState()` in `initialize()` (`word_pyramid.cpp`); `delete activePuzzle` in `~WordPyramidGame()` destructor; `WordPyramidGame* game = new WordPyramidGame()` in `runWordPyramidGame()`; `delete game` after each round |
+| **File input/output** | `loadWordBank()` reads `easy_words.txt`, `medium_words.txt`, `hard_words.txt` (input); `logGameResult()` appends game outcomes (WIN/EXIT, targets, guesses, hints left) to `game_log.txt` (output) – both in `word_pyramid.cpp` |
+| **Program codes in multiple files** | `word_pyramid.h`, `word_pyramid.cpp`, `main.cpp`, `Makefile` |
+| **Multiple Difficulty Levels** | `buildPuzzleSets()` creates three separate puzzle banks; user selects 1 (Easy), 2 (Medium), or 3 (Hard) in `runWordPyramidGame()`; `initialize(int difficultyChoice)` chooses the appropriate bank; `currentDifficulty` changes displayed category – all in `word_pyramid.cpp` |
+
+# Difficulty Levels
+
+| Difficulty | Word Category | Words per Puzzle | Total Letters | Hints |
+|------------|---------------|------------------|---------------|-------|
+| Easy (1) | Gods, Monsters, and Myths (Greek, Roman, Egyptian, Hindu, Nordic) | 4–7 | 40–60 | 3 |
+| Medium (2) | Empires, Innovation, Monuments | 4–7 | 40–60 | 3 |
+| Hard (3) | Rulers, Pharaohs, and Heroes (Greek, Roman, Egyptian, Nordic) | 4–7 | 40–60 | 3 |
+
+# Commands
+
+| Command | Description |
+|---------|-------------|
+| `[word]` | Guess a word (e.g., `FOX`). Must use only letters currently in the pyramid |
+| `clear` | Resets the letter pool and guessed words – restarts the current puzzle |
+| `hint` | Reveals one random unguessed target word (max 3 hints per puzzle) |
+| `exit` | Returns to the main difficulty selection menu |
+
+# How to Play
+
+1. Run `./word_pyramid` and select a difficulty level (1=Easy, 2=Medium, 3=Hard)
+2. Read the category and the number of hidden words
+3. Look at the letter pyramid – all available letters are shown
+4. Type a word that can be formed from those letters
+5. If correct, letters are removed and the word appears in the “Guessed words” list
+6. Use `clear` to restart the puzzle if stuck
+7. Use `hint` for a random revealed word (max 3 hints)
+8. Guess all hidden words to win and escape the pyramid
+9. Type `exit` to go back and change difficulty or quit
 
 ### App 2: The Director's Archive
 **Theme:** Movies and Heritage Sites  
