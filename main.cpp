@@ -52,7 +52,7 @@ void printBanner()
     cout << R"(
    ╔═══════════════════════════════════════════════════════════════╗
    ║                                                               ║
-   ║                      O D Y S S E Y   O S                     ║
+   ║                      O D Y S S E Y   O S                      ║
    ║                                                               ║
    ║               The Forgery Authentication Unit                 ║
    ║                                                               ║
