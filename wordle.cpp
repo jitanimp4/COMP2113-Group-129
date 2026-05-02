@@ -16,7 +16,6 @@
 #include <algorithm>
 #include <cctype>
 #include <iomanip>
-#include <fstream>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -54,8 +53,8 @@ const vector<string> MEDIUM_WORDS = {
 };
 
 const vector<string> HARD_WORDS = {
-    "ZIGGURAT", "STELA", "LINTEL", "OGIVE", "TRABEATION",
-    "DORIC", "IONIC", "CORINTHIAN", "CARYATID", "ROSETTA"
+    "ZIGG", "STELA", "LINTL", "OGIVE", "TRABE",
+    "DORIC", "IONIC", "CORIN", "CARYA", "ROSET"
 };
 
 // ================================
@@ -146,6 +145,7 @@ private:
     vector<string> wordBank;
     ConsoleColor console;
     bool exitRequested;
+    bool showInstructionsFlag;
     
     const vector<string> successMessages = {
         "Temporal fragment recovered!",
@@ -167,7 +167,8 @@ public:
         gameWon(false), 
         gameActive(true),
         difficulty(diff),
-        exitRequested(false) {
+        exitRequested(false),
+        showInstructionsFlag(true) {
         
         switch(difficulty) {
             case EASY:
@@ -187,17 +188,6 @@ public:
         srand(time(nullptr));
         targetWord = wordBank[rand() % wordBank.size()];
         
-        // Make sure target word is exactly 5 letters for easy/medium
-        if (difficulty == HARD) {
-            // Filter HARD_WORDS to only 5-letter words
-            for (const auto& word : wordBank) {
-                if (word.length() == 5) {
-                    targetWord = word;
-                    break;
-                }
-            }
-        }
-        
         grid.resize(6, vector<Cell>(5));
         for (int i = 0; i < 6; ++i) {
             for (int j = 0; j < 5; ++j) {
@@ -213,121 +203,115 @@ public:
         cout << "\033[2J\033[1;1H";
     }
     
-    void drawTopBorder() {
+    void displayInstructions() {
+        clearScreen();
         console.setColor(36);
-        cout << "╔════════════════════════════════════════════════════════════════════════════════╗\n";
+        cout << "\n========== TIME-SLIP SYNDICATE - INSTRUCTIONS ==========\n\n";
         console.reset();
-    }
-    
-    void drawBottomBorder() {
-        console.setColor(36);
-        cout << "╚════════════════════════════════════════════════════════════════════════════════╝\n";
-        console.reset();
-    }
-    
-    void drawHeader() {
-        console.setColor(36);
-        cout << "║  [TEMPORAL ARCHIVE v2.47]";
+        
+        console.setColor(37);
+        cout << "OBJECTIVE: Guess the 5-letter historical/architectural word in 6 tries!\n\n";
         
         console.setColor(32);
-        cout << "  [SCANNING]";
-        
+        cout << "COLOR MEANING:\n";
+        cout << "  GREEN  - Letter is CORRECT and in RIGHT position\n";
         console.setColor(33);
-        cout << " [ONLINE]";
-        
-        console.setColor(32);
-        cout << " [SECURE]";
-        
-        console.setColor(36);
-        cout << "                                      ║\n";
-        console.reset();
-        
+        cout << "  YELLOW - Letter is CORRECT but in WRONG position\n";
         console.setColor(90);
-        cout << "║  ⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡  ║\n";
-        console.reset();
-    }
-    
-    void drawSidePanels() {
-        console.setColor(33);
-        cout << "║  ┌─────────────┐                                                ║\n";
-        cout << "║  │ [CLASSICAL] │                                                ║\n";
-        cout << "║  │    🏛       │                                                ║\n";
-        cout << "║  ├─────────────┤                                                ║\n";
-        cout << "║  │ [MEDIEVAL]  │                                                ║\n";
-        cout << "║  │    🏰       │                                                ║\n";
-        cout << "║  ├─────────────┤                                                ║\n";
-        cout << "║  │  [MODERN]   │                                                ║\n";
-        cout << "║  │    🏭       │                                                ║\n";
-        cout << "║  └─────────────┘                                                ║\n";
-        console.reset();
-    }
-    
-    void drawTimer() {
-        int remaining = guessTimer.getRemaining();
-        
-        cout << "║  ";
-        console.setColor(remaining < 5 ? 31 : 33);
-        cout << "[TIME: " << setw(2) << remaining << "s ";
-        
-        int progress = (remaining * 10) / timeLimit;
-        for (int i = 0; i < progress; ++i) cout << "█";
-        for (int i = progress; i < 10; ++i) cout << "░";
-        cout << "]";
-        
+        cout << "  GRAY   - Letter is NOT in the word\n\n";
         console.reset();
         
         console.setColor(36);
-        cout << "  [ATTEMPT: " << currentRow + 1 << "/6]";
+        cout << "CONTROLS:\n";
+        console.reset();
+        cout << "  • Type letters A-Z to form your 5-letter guess\n";
+        cout << "  • Press ENTER to submit your guess\n";
+        cout << "  • Press BACKSPACE to delete letters\n";
+        cout << "  • Press ESC to exit the game at any time\n\n";
+        
+        console.setColor(33);
+        cout << "DIFFICULTY LEVELS:\n";
+        console.reset();
+        cout << "  • EASY   - 30 seconds per guess, hints available\n";
+        cout << "  • MEDIUM - 20 seconds per guess, standard challenge\n";
+        cout << "  • HARD   - 10 seconds per guess, no hints\n\n";
+        
+        console.setColor(36);
+        cout << "TIP: Start with words containing common vowels (A, E, I, O, U)\n";
+        cout << "     to identify which letters are in the target word!\n";
         console.reset();
         
-        console.setColor(31);
-        cout << "  [ESC to EXIT]";
-        console.reset();
-        
-        int spaces = 69 - (15 + (remaining < 5 ? 0 : 0));
-        for (int i = 0; i < spaces; ++i) cout << " ";
-        cout << "║\n";
+        cout << "\n=======================================================\n\n";
+        cout << "Press ENTER to start the game...";
+        cin.get();
+        clearScreen();
     }
     
-    void drawWordleGrid() {
+    void drawGameUI() {
+        clearScreen();
+        
+        // Title
+        console.setColor(36);
+        cout << "\n========== THE TIME-SLIP SYNDICATE ==========\n";
+        console.reset();
+        
+        // Difficulty and Timer
+        string diffStr;
+        switch(difficulty) {
+            case EASY: diffStr = "EASY"; break;
+            case MEDIUM: diffStr = "MEDIUM"; break;
+            case HARD: diffStr = "HARD"; break;
+        }
+        
+        int remaining = guessTimer.getRemaining();
+        console.setColor(remaining < 5 ? 31 : 33);
+        cout << "\n[" << diffStr << " MODE]  [TIME: " << remaining << "s]  [ATTEMPT: " << currentRow + 1 << "/6]";
+        console.setColor(31);
+        cout << "  [ESC to EXIT]\n";
+        console.reset();
+        
+        cout << "\n---------------------------------------------\n\n";
+        
+        // Draw the grid
         for (int row = 0; row < 6; ++row) {
-            cout << "║  ";
-            
+            // Show current row indicator
             if (row == currentRow && gameActive && !gameWon && !exitRequested) {
                 console.setColor(36);
-                cout << "▶";
+                cout << "▶ ";
                 console.reset();
-                cout << " ";
             } else {
-                cout << "  ";
+                cout << "   ";
             }
             
+            // Draw each cell in the row
             for (int col = 0; col < 5; ++col) {
                 switch(grid[row][col].state) {
                     case CORRECT:
-                        console.setColor(32);
+                        console.setColor(32); // Green
                         break;
                     case MISPLACED:
-                        console.setColor(33);
+                        console.setColor(33); // Yellow
                         break;
                     case WRONG:
-                        console.setColor(90);
+                        console.setColor(90); // Gray
                         break;
                     default:
-                        console.setColor(37);
+                        console.setColor(37); // White
                 }
                 
-                cout << " " << (grid[row][col].letter == ' ' ? '_' : grid[row][col].letter) << "  ";
+                char displayChar = (grid[row][col].letter == ' ') ? '_' : grid[row][col].letter;
+                cout << "[" << displayChar << "] ";
+                console.reset();
             }
-            cout << "║\n";
-            console.reset();
+            cout << "\n";
         }
-    }
-    
-    void drawInputArea() {
+        
+        cout << "\n---------------------------------------------\n";
+        
+        // Input area
         console.setColor(36);
-        cout << "║  ┌────────────────────────────────────────────────────────────────────┐  ║\n";
-        cout << "║  │ [GUESS: ";
+        cout << "\nGUESS: ";
+        console.reset();
         
         for (size_t i = 0; i < currentGuess.length(); ++i) {
             console.setColor(37);
@@ -339,66 +323,20 @@ public:
             cout << "_ ";
         }
         
-        console.setColor(36);
-        cout << "]";
-        
-        if (difficulty == EASY && currentRow == 2 && !gameWon) {
-            console.setColor(33);
-            cout << "  [HINT: Common letters in historical terms]";
-        } else {
-            console.setColor(90);
-            cout << "  [Enter 5-letter word, ENTER to submit]";
-        }
-        
-        int spaces = 70 - (15 + (int)currentGuess.length() * 2);
-        for (int i = 0; i < spaces; ++i) cout << " ";
-        
-        console.setColor(36);
-        cout << "┘  ║\n";
-        cout << "║  └────────────────────────────────────────────────────────────────────┘  ║\n";
         console.reset();
+        cout << "\n\n";
     }
     
     void drawStatusMessage(const string& message, int color) {
         console.setColor(color);
-        cout << "║  ";
-        cout << message;
-        int spaces = 76 - (int)message.length();
-        for (int i = 0; i < spaces; ++i) cout << " ";
-        cout << "║\n";
+        cout << "\n*** " << message << " ***\n";
         console.reset();
-    }
-    
-    void drawInterface(const string& statusMsg = "", int statusColor = 37) {
-        clearScreen();
-        drawTopBorder();
-        drawHeader();
-        drawSidePanels();
-        drawTimer();
-        
-        console.setColor(36);
-        cout << "║  ┌────────────────────────────────────────────────────────────────────┐  ║\n";
-        console.reset();
-        
-        drawWordleGrid();
-        
-        console.setColor(36);
-        cout << "║  └────────────────────────────────────────────────────────────────────┘  ║\n";
-        console.reset();
-        
-        drawInputArea();
-        
-        if (!statusMsg.empty()) {
-            drawStatusMessage(statusMsg, statusColor);
-        }
-        
-        drawBottomBorder();
+        this_thread::sleep_for(chrono::milliseconds(1500));
     }
     
     bool evaluateGuess() {
         if (currentGuess.length() != 5) {
-            drawInterface("INCOMPLETE TEMPORAL DATA - Need 5 letters!", 33);
-            this_thread::sleep_for(chrono::milliseconds(1000));
+            drawStatusMessage("INCOMPLETE! Need 5 letters!", 33);
             return false;
         }
         
@@ -414,9 +352,6 @@ public:
             gameWon = true;
             gameActive = false;
             guessTimer.stop();
-            drawInterface();
-            drawStatusMessage(successMessages[rand() % successMessages.size()], 32);
-            drawStatusMessage("★ TIMELINE RESTORED! ★", 36);
             return true;
         }
         
@@ -446,8 +381,7 @@ public:
             }
         }
         
-        drawInterface(failureMessages[rand() % failureMessages.size()], 36);
-        this_thread::sleep_for(chrono::milliseconds(800));
+        drawStatusMessage(failureMessages[rand() % failureMessages.size()], 36);
         
         currentRow++;
         currentGuess = "";
@@ -455,9 +389,6 @@ public:
         
         if (currentRow >= 6) {
             gameActive = false;
-            drawInterface();
-            drawStatusMessage("✗ TIMELINE CORRUPTED!", 31);
-            drawStatusMessage("The historical fragment was: " + targetWord, 33);
             return false;
         }
         
@@ -503,16 +434,32 @@ public:
 #endif
     }
     
+    void showHint() {
+        if (difficulty == EASY && currentRow == 3 && !gameWon && !exitRequested) {
+            console.setColor(33);
+            cout << "\n[HINT: The word contains letters: ";
+            for (char c : targetWord) {
+                cout << c << " ";
+            }
+            cout << "]\n";
+            console.reset();
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+    }
+    
     void run() {
-        drawInterface("Welcome, Time Agent. Decode the historical fragment.", 36);
-        this_thread::sleep_for(chrono::milliseconds(2000));
+        if (showInstructionsFlag) {
+            displayInstructions();
+            showInstructionsFlag = false;
+        }
         
         while (gameActive && !gameWon && currentRow < 6 && !exitRequested) {
-            drawInterface();
+            drawGameUI();
+            showHint();
             
+            // Check timer expiration
             if (guessTimer.isExpired()) {
-                drawInterface("⚠ TIME PARADOX! Guess expired! ⚠", 31);
-                this_thread::sleep_for(chrono::milliseconds(1500));
+                drawStatusMessage("TIME PARADOX! Guess expired!", 31);
                 
                 currentRow++;
                 currentGuess = "";
@@ -523,21 +470,18 @@ public:
                 
                 if (currentRow >= 6) {
                     gameActive = false;
-                    drawInterface();
-                    drawStatusMessage("✗ TIMELINE CORRUPTED!", 31);
-                    drawStatusMessage("The historical fragment was: " + targetWord, 33);
                     break;
                 }
                 continue;
             }
             
+            // Handle input
             if (keyAvailable() && gameActive && !gameWon) {
                 char key = getKey();
                 
                 if (key == 27) { // ESC key
                     exitRequested = true;
-                    drawInterface("EXITING GAME...", 31);
-                    this_thread::sleep_for(chrono::milliseconds(1000));
+                    drawStatusMessage("Exiting game...", 31);
                     break;
                 }
                 else if (key == '\n' || key == '\r') {
@@ -558,74 +502,145 @@ public:
             this_thread::sleep_for(chrono::milliseconds(50));
         }
         
-        drawInterface();
+        // Game over screen
+        drawGameUI();
+        cout << "\n";
+        
         if (gameWon && !exitRequested) {
-            drawStatusMessage("★ TEMPORAL ARCHIVE COMPLETE! ★", 32);
-            drawStatusMessage("You have successfully restored the timeline!", 36);
-        } else if (!exitRequested) {
-            drawStatusMessage("✗ TEMPORAL ARCHIVE FAILED ✗", 31);
-            drawStatusMessage("The historical fragment was: " + targetWord, 33);
-        } else {
-            drawStatusMessage("✗ GAME EXITED ✗", 31);
-            drawStatusMessage("Timeline preservation aborted.", 33);
+            console.setColor(32);
+            cout << "=============================================\n";
+            cout << "  ★ TEMPORAL ARCHIVE COMPLETE! ★\n";
+            cout << "  You successfully restored the timeline!\n";
+            cout << "=============================================\n";
+            console.reset();
+        } 
+        else if (!exitRequested && !gameWon) {
+            console.setColor(31);
+            cout << "=============================================\n";
+            cout << "  ✗ TEMPORAL ARCHIVE FAILED ✗\n";
+            cout << "  The historical fragment was: " << targetWord << "\n";
+            cout << "=============================================\n";
+            console.reset();
+        } 
+        else if (exitRequested) {
+            console.setColor(33);
+            cout << "=============================================\n";
+            cout << "  Game exited.\n";
+            cout << "  Timeline preservation aborted.\n";
+            cout << "=============================================\n";
+            console.reset();
         }
         
-        drawStatusMessage("Press any key to exit...", 37);
-        getKey();
+        console.setColor(37);
+        cout << "\nPress ENTER to return to main menu...";
+        console.reset();
+        cin.ignore();
+        cin.get();
     }
 };
 
+// ================================
+// Main Function
+// ================================
+
 int runWordleApp() {
-    cout << "\033[2J\033[1;1H";
-    cout << "\n\n\n";
-    
     ConsoleColor console;
-    console.setColor(36);
-    cout << "   ╔══════════════════════════════════════════════════════════════════════╗\n";
-    cout << "   ║                                                                      ║\n";
-    cout << "   ║     ████████╗██╗███╗   ███╗███████╗                                 ║\n";
-    cout << "   ║     ╚══██╔══╝██║████╗ ████║██╔════╝                                 ║\n";
-    cout << "   ║        ██║   ██║██╔████╔██║█████╗                                   ║\n";
-    cout << "   ║        ██║   ██║██║╚██╔╝██║██╔══╝                                   ║\n";
-    cout << "   ║        ██║   ██║██║ ╚═╝ ██║███████╗                                 ║\n";
-    cout << "   ║        ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝                                 ║\n";
-    cout << "   ║                                                                      ║\n";
-    cout << "   ║              THE TIME-SLIP SYNDICATE                                 ║\n";
-    cout << "   ║            ARCHITECTURAL WORDLE v1.0                                 ║\n";
-    cout << "   ║                                                                      ║\n";
-    cout << "   ╚══════════════════════════════════════════════════════════════════════╝\n";
-    console.reset();
     
-    cout << "\n\n";
-    console.setColor(33);
-    cout << "   ╔══════════════════════════════════════════════════════════════════════╗\n";
-    cout << "   ║                         SELECT DIFFICULTY                           ║\n";
-    cout << "   ╠══════════════════════════════════════════════════════════════════════╣\n";
-    cout << "   ║                                                                      ║\n";
-    cout << "   ║    1. EASY     - 30s per guess, visual aids, hints                  ║\n";
-    cout << "   ║    2. MEDIUM   - 20s per guess, standard challenge                  ║\n";
-    cout << "   ║    3. HARD     - 10s per guess, expert time trial, no hints         ║\n";
-    cout << "   ║                                                                      ║\n";
-    cout << "   ╚══════════════════════════════════════════════════════════════════════╝\n";
-    console.reset();
-    
-    cout << "\n   Choice: ";
-    
-    int choice;
-    cin >> choice;
-    cin.ignore();
-    cin.clear();
-    
-    Difficulty diff;
-    switch(choice) {
-        case 1: diff = EASY; break;
-        case 2: diff = MEDIUM; break;
-        case 3: diff = HARD; break;
-        default: diff = MEDIUM;
+    while (true) {
+        cout << "\033[2J\033[1;1H";
+        cout << "\n\n";
+        
+        console.setColor(36);
+        cout << "=============================================\n";
+        cout << "      THE TIME-SLIP SYNDICATE\n";
+        cout << "      Architectural Wordle Game\n";
+        cout << "=============================================\n";
+        console.reset();
+        
+        console.setColor(33);
+        cout << "\n          MAIN MENU\n";
+        console.reset();
+        cout << "\n    1. EASY     - 30s per guess, with hints";
+        cout << "\n    2. MEDIUM   - 20s per guess, standard challenge";
+        cout << "\n    3. HARD     - 10s per guess, expert mode";
+        cout << "\n    4. INSTRUCTIONS";
+        cout << "\n    5. EXIT     - Quit the game\n";
+        
+        console.setColor(36);
+        cout << "\n    Choice: ";
+        console.reset();
+        
+        int choice;
+        cin >> choice;
+        cin.ignore();
+        
+        if (choice == 5) {
+            console.setColor(32);
+            cout << "\nThank you for playing The Time-Slip Syndicate!\n";
+            console.reset();
+            return 0;
+        }
+        
+        if (choice == 4) {
+            // Display instructions
+            cout << "\033[2J\033[1;1H";
+            console.setColor(36);
+            cout << "\n========== TIME-SLIP SYNDICATE - INSTRUCTIONS ==========\n\n";
+            console.reset();
+            
+            console.setColor(37);
+            cout << "OBJECTIVE: Guess the 5-letter historical/architectural word in 6 tries!\n\n";
+            
+            console.setColor(32);
+            cout << "COLOR MEANING:\n";
+            cout << "  GREEN  - Letter is CORRECT and in RIGHT position\n";
+            console.setColor(33);
+            cout << "  YELLOW - Letter is CORRECT but in WRONG position\n";
+            console.setColor(90);
+            cout << "  GRAY   - Letter is NOT in the word\n\n";
+            console.reset();
+            
+            console.setColor(36);
+            cout << "CONTROLS:\n";
+            console.reset();
+            cout << "  • Type letters A-Z to form your 5-letter guess\n";
+            cout << "  • Press ENTER to submit your guess\n";
+            cout << "  • Press BACKSPACE to delete letters\n";
+            cout << "  • Press ESC to exit the game at any time\n\n";
+            
+            console.setColor(33);
+            cout << "DIFFICULTY LEVELS:\n";
+            console.reset();
+            cout << "  • EASY   - 30 seconds per guess, hints available\n";
+            cout << "  • MEDIUM - 20 seconds per guess, standard challenge\n";
+            cout << "  • HARD   - 10 seconds per guess, no hints\n\n";
+            
+            console.setColor(36);
+            cout << "TIP: Start with words containing common vowels (A, E, I, O, U)\n";
+            console.reset();
+            
+            cout << "\n=======================================================\n\n";
+            cout << "Press ENTER to return to main menu...";
+            cin.get();
+            continue;
+        }
+        
+        Difficulty diff;
+        switch(choice) {
+            case 1: diff = EASY; break;
+            case 2: diff = MEDIUM; break;
+            case 3: diff = HARD; break;
+            default: 
+                console.setColor(31);
+                cout << "\nInvalid choice! Please select 1, 2, 3, 4, or 5.\n";
+                console.reset();
+                this_thread::sleep_for(chrono::milliseconds(1500));
+                continue;
+        }
+        
+        TimeSlipSyndicate game(diff);
+        game.run();
     }
-    
-    TimeSlipSyndicate game(diff);
-    game.run();
     
     return 0;
 }
