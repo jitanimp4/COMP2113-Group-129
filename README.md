@@ -73,6 +73,8 @@ Architecture & History - A Wordle-style game where players decode 5-letter histo
 | MEDIUM | 20s | 10 mixed words (TOMBS, AZTEC, PYLON, etc.) | Limited |
 | HARD | 10s | 10 obscure terms (ZIGG, STELA, OGIVE, etc.) | None |
 
+
+
 ### App 4: Crossword
 **Theme:** Wonders & Landmarks, Art Movements, Iconoclasts  
 
