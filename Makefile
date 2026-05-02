@@ -10,7 +10,8 @@ SRC = main.cpp \
       word_pyramid.cpp \
       wordle.cpp \
       game.cpp \
-      puzzle.cpp
+      puzzle.cpp \
+      forgers_table.cpp
 
 all: $(TARGET)
 
