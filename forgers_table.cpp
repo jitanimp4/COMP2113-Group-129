@@ -20,16 +20,8 @@
 #include <ctime>
 #include <functional>
 #include "forgers_table.h"
+#include "art.h"
 
-#ifdef _WIN32
-  #include <windows.h>
-  void sleepMs(int ms) { Sleep(ms); }
-  void clearScreen()   { system("cls"); }
-#else
-  #include <unistd.h>
-  void sleepMs(int ms) { usleep(static_cast<useconds_t>(ms) * 1000); }
-  void clearScreen()   { system("clear"); }
-#endif
 
 // ── Constants ──────────────────────────────────────────────────
 const int  FW              = 30;   // field column display width
