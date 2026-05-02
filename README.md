@@ -96,8 +96,6 @@ A terminal-based word pyramid puzzle where letters are arranged in a triangular 
 
 # App 3: The Time-Slip Syndicate
 
-**Developer:** Krislyn Mariah Mendonca
-
 ## Theme
 Architecture & History - A Wordle-style game where players decode 5-letter historical and architectural terms.The Time-Slip Syndicate is an immersive terminal-based word puzzle game that transports players into a high-tech temporal archive. As a Time Agent, players must decode corrupted historical fragments by guessing 5-letter architectural and historical terms. The game features a sleek retro-futuristic interface with real-time countdown timers, color-coded feedback, and difficulty levels that scale the challenge. Each correct guess brings players closer to restoring the timeline, while incorrect guesses or time expirations risk permanent timeline corruption. With thematic success messages like "Temporal fragment recovered!" and "Historical resonance detected!", the game creates an engaging atmosphere of archaeological discovery and temporal investigation.
 
