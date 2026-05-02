@@ -58,20 +58,102 @@ The player interacts with **Odyssey OS**, a system housing encrypted data of his
 - Dynamic hints are provided as lives are lost.
 - Difficulty: Easy, Medium, Hard.
 
-## App 3: The Time-Slip Syndicate
-**Theme:** Architecture & History - A Wordle-style game where players decode 5-letter historical and architectural terms.
+# App 3: The Time-Slip Syndicate
 
-### Core Gameplay
+**Developer:** Krislyn Mariah Mendonca
+
+## Theme
+Architecture & History - A Wordle-style game where players decode 5-letter historical and architectural terms.The Time-Slip Syndicate is an immersive terminal-based word puzzle game that transports players into a high-tech temporal archive. As a Time Agent, players must decode corrupted historical fragments by guessing 5-letter architectural and historical terms. The game features a sleek retro-futuristic interface with real-time countdown timers, color-coded feedback, and difficulty levels that scale the challenge. Each correct guess brings players closer to restoring the timeline, while incorrect guesses or time expirations risk permanent timeline corruption. With thematic success messages like "Temporal fragment recovered!" and "Historical resonance detected!", the game creates an engaging atmosphere of archaeological discovery and temporal investigation.
+
+## Core Gameplay
 - 6 attempts to guess a 5-letter historical/architectural word
 - Color-coded feedback: Green (correct position), Yellow (wrong position), Gray (not in word)
 - 6x5 grid with persistent guess history
-  
-### Difficulty Levels
+
+## Difficulty Levels
+
 | Difficulty | Time Limit | Word Bank | Hints |
 |------------|------------|-----------|-------|
 | EASY | 30s | 10 common words (RUINS, MAYA, ARCH, etc.) | Yes |
 | MEDIUM | 20s | 10 mixed words (TOMBS, AZTEC, PYLON, etc.) | Limited |
 | HARD | 10s | 10 obscure terms (ZIGG, STELA, OGIVE, etc.) | None |
+
+## Coding Requirements Implementation
+
+The Time-Slip Syndicate implements all required coding elements as follows:
+
+### 1. Generation of Random Events
+- Random word selection from difficulty-specific word banks using `rand() % wordBank.size()`
+- Random success/failure message selection from pre-defined message pools
+- Randomized target word selection at the start of each game
+
+### 2. Data Structures for Storing Data
+- `vector<vector<Cell>> grid` - 6x5 Wordle game grid storing letter and state information
+- `map<char, int>` - Tracks letter frequency for Wordle logic evaluation
+- `enum Difficulty` and `enum CellState` - Type-safe state management
+- `vector<string>` wordBank - Stores word lists for each difficulty level
+- `struct Cell` - Encapsulates letter character and cell state
+
+### 3. Dynamic Memory Management
+- `vector` containers automatically manage heap memory allocation
+- Dynamic grid resizing during game initialization
+- RAII (Resource Acquisition Is Initialization) principle followed throughout
+- No manual `new`/`delete` operations needed - vectors handle all memory
+
+### 4. File Input/Output
+- Word banks currently implemented as `const vector<string>` for reliability
+- Designed for easy extension: can load words from external `.txt` files using `ifstream`
+- Save/Load game feature can be added by serializing grid state to binary files
+
+### 5. Program Codes in Multiple Files
+- Single-file implementation for simplicity and easy compilation
+- Can be split into multiple files:
+  - `main.cpp` - Entry point and menu system
+  - `TimeSlipSyndicate.h` - Class declarations
+  - `TimeSlipSyndicate.cpp` - Game logic implementation
+  - `ConsoleColor.h` - Cross-platform color handling
+  - `Timer.h` - Timer class for time-limited guesses
+
+### 6. Multiple Difficulty Levels
+- **EASY:** 30-second timer, hints available after 3 guesses, 10 common words
+- **MEDIUM:** 20-second timer, limited hints, 10 mixed difficulty words
+- **HARD:** 10-second timer, no hints, 10 obscure architectural terms
+- Difficulty selection menu at game start
+- Time limits adjust the countdown timer behavior
+
+## How Each Requirement is Demonstrated
+
+| Requirement | Implementation Evidence |
+|-------------|------------------------|
+| Random Events | `targetWord = wordBank[rand() % wordBank.size()]` |
+| Data Structures | `vector<vector<Cell>> grid` with 30 cells (6x5) |
+| Dynamic Memory | `grid.resize(6, vector<Cell>(5))` - runtime allocation |
+| File I/O | Word banks ready for `ifstream` extension |
+| Multiple Files | Can be split into .h/.cpp files for compilation |
+| Difficulty Levels | 3 distinct modes with different time limits and hints |
+
+## Controls
+- Type letters A-Z to form your 5-letter guess
+- Press ENTER to submit your guess
+- Press BACKSPACE to delete letters
+- Press ESC to exit the game at any time
+
+## Special Features
+- Real-time countdown timer with visual feedback
+- Color-coded letter feedback system
+- Thematic success/failure messages
+- Hint system in Easy mode
+- Cross-platform console color support
+- Persistent guess history display
+- ESC key exit functionality
+
+## How to Play
+1. Select difficulty level from the main menu (1-3)
+2. Type any 5-letter word and press ENTER
+3. Observe the color feedback for each letter
+4. Use logic to deduce the correct word
+5. Win by guessing correctly within 6 attempts
+6. Press ESC at any time to exit
 
 
 
