@@ -42,12 +42,11 @@ The player interacts with **Odyssey OS**, a system housing encrypted data of his
 
 ## Mini-Games Overview
 
-### App 1: Word Pyramids of Giza
-### App 1: Word Pyramids of Giza
-# Overview
+## App 1: Word Pyramids of Giza
+### Overview
 A terminal-based word pyramid puzzle where letters are arranged in a triangular formation. Players must identify and guess all hidden words using only the letters shown in the pyramid. The game features multiple difficulty levels with different historical and mythological categories, a hint system, a clear/reset function, and file-based word banks.
 
-# Coding Elements Implementation
+### Coding Elements Implementation
 
 | Requirement | Implementation Location |
 |-------------|------------------------|
@@ -58,7 +57,7 @@ A terminal-based word pyramid puzzle where letters are arranged in a triangular 
 | **Program codes in multiple files** | `word_pyramid.h`, `word_pyramid.cpp`, `main.cpp`, `Makefile` |
 | **Multiple Difficulty Levels** | `buildPuzzleSets()` creates three separate puzzle banks; user selects 1 (Easy), 2 (Medium), or 3 (Hard) in `runWordPyramidGame()`; `initialize(int difficultyChoice)` chooses the appropriate bank; `currentDifficulty` changes displayed category – all in `word_pyramid.cpp` |
 
-# Difficulty Levels
+### Difficulty Levels
 
 | Difficulty | Word Category | Words per Puzzle | Total Letters | Hints |
 |------------|---------------|------------------|---------------|-------|
@@ -66,7 +65,7 @@ A terminal-based word pyramid puzzle where letters are arranged in a triangular 
 | Medium (2) | Empires, Innovation, Monuments | 4–7 | 40–60 | 3 |
 | Hard (3) | Rulers, Pharaohs, and Heroes (Greek, Roman, Egyptian, Nordic) | 4–7 | 40–60 | 3 |
 
-# Commands
+### Commands
 
 | Command | Description |
 |---------|-------------|
@@ -75,7 +74,7 @@ A terminal-based word pyramid puzzle where letters are arranged in a triangular 
 | `hint` | Reveals one random unguessed target word (max 3 hints per puzzle) |
 | `exit` | Returns to the main difficulty selection menu |
 
-# How to Play
+### How to Play
 
 1. Run `./word_pyramid` and select a difficulty level (1=Easy, 2=Medium, 3=Hard)
 2. Read the category and the number of hidden words
