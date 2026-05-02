@@ -93,10 +93,61 @@ Architecture & History - A Wordle-style game where players decode 5-letter histo
 
 ### App 4: Crossword
 **Theme:** Wonders & Landmarks, Art Movements, Iconoclasts  
-**Game Mechanics:**
-- A crossword puzzle with a word bank where players match clues to words from the bank.
-- Difficulty: Easy (Famous landmarks), Medium (Art movements), Hard (Iconoclasts and architects).
-- Time limits and hints are available, with the challenge scaling in difficulty.
+
+## Overview
+A terminal-based crossword puzzle game where players solve clues to uncover words from a word bank. The game features multiple difficulty levels, time limits, hint systems, scoring mechanics, and save/load functionality.
+
+## Coding Elements Implementation
+
+| Requirement | Implementation Location |
+|-------------|------------------------|
+| **Generation of random events** | `revealOneLetter()` in `game.cpp` - randomly selects unsolved clues and random letter positions |
+| **Data structures for storing data** | `struct GameState`, `struct Clue`, `struct DifficultyConfig` in `puzzle.h` - uses vectors, sets, maps |
+| **Dynamic memory management** | `std::unique_ptr<GameState>` in `game.h` - automatic memory management |
+| **File input/output** | `saveGame()` and `loadGame()` in `game.cpp` - saves/loads game state to `save_data.txt` |
+| **Program codes in multiple files** | `main.cpp`, `game.cpp`, `game.h`, `puzzle.cpp`, `puzzle.h`, `art.h` |
+| **Multiple Difficulty Levels** | `getConfig()` in `puzzle.cpp` - Easy, Medium, Hard with different settings |
+
+## Difficulty Levels
+
+| Difficulty | Grid Size | Time Limit | Max Hints | Base Points |
+|------------|-----------|------------|-----------|-------------|
+| Easy | 7x7 | None | Unlimited | 100 |
+| Medium | 9x9 | 10 minutes | 3 | 150 |
+| Hard | 11x11 | 7 minutes | 1 | 220 |
+
+## How to Play
+
+1. Run the program and select a difficulty level (1=Easy, 2=Medium, 3=Hard)
+2. View the clues (Across and Down) and the word bank
+3. Use the `solve` command to guess a word for a clue
+4. Use `hint` to reveal a random letter (costs points on higher difficulties)
+5. Use `clues` to view clues again
+6. Use `save` to save progress
+7. Use `quit` to save and exit
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `solve` | Enter clue number, direction (A/D), and word from bank |
+| `hint` | Reveals one random letter from an unsolved clue |
+| `clues` | Displays all clues again |
+| `save` | Saves current game progress |
+| `quit` | Saves and exits the game |
+
+## Scoring System
+
+| Action | Points |
+|--------|--------|
+| Correct word | +100 (Easy), +150 (Medium), +220 (Hard) |
+| Wrong guess | 0 (Easy), -10 (Medium), -25 (Hard) |
+| Streak bonus (Medium) | +2 points every 7 correct words |
+| Time bonus (Medium/Hard) | Points per second remaining |
+| Hint penalty (Medium) | 7% reduction per hint (max 90%) |
+| Hint penalty (Hard) | -150 points per hint |
+
+## File Structure
 
 ### App 5: The Forger's Table
 **Theme:** Heritage Crimes Investigation  
