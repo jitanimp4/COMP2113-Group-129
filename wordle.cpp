@@ -221,6 +221,7 @@ private:
     int timeLimit;                        ///< Time limit based on difficulty
     vector<string> wordBank;              ///< Words for selected difficulty
     ConsoleColor console;                 ///< Console color handler
+    bool exitRequested;                   ///< Flag for exit request
     
     // Immersive messages for feedback
     const vector<string> successMessages = {
@@ -250,7 +251,8 @@ public:
         currentRow(0), 
         gameWon(false), 
         gameActive(true),
-        difficulty(diff) {
+        difficulty(diff),
+        exitRequested(false) {
         
         // Set time limit and word bank based on difficulty
         switch(difficulty) {
@@ -386,6 +388,11 @@ public:
         // Show attempt counter
         console.setColor(36);
         cout << "  [ATTEMPT: " << currentRow + 1 << "/6]";
+        console.reset();
+        
+        // Show exit hint
+        console.setColor(31);
+        cout << "  [Press ESC to EXIT]";
         console.reset();
         
         // Adjust spacing to align with right border
@@ -751,7 +758,7 @@ public:
         this_thread::sleep_for(chrono::milliseconds(2000));
         
         // Main game loop
-        while (gameActive && !gameWon && currentRow < 6) {
+        while (gameActive && !gameWon && currentRow < 6 && !exitRequested) {
             drawInterface();
             
             // Check timer expiration
@@ -780,7 +787,14 @@ public:
             if (keyAvailable() && gameActive && !gameWon) {
                 char key = getKey();
                 
-                if (key == '\n' || key == '\r') {
+                // Check for ESC key (ASCII 27) to exit
+                if (key == 27) { // ESC key
+                    exitRequested = true;
+                    drawInterface("EXITING GAME...", 31);
+                    this_thread::sleep_for(chrono::milliseconds(1000));
+                    break;
+                }
+                else if (key == '\n' || key == '\r') {
                     evaluateGuess();
                 } 
                 else if (key == '\b' || key == 127) {
@@ -800,16 +814,27 @@ public:
         
         // Game over message
         drawInterface();
-        if (gameWon) {
+        if (gameWon && !exitRequested) {
             drawStatusMessage("★ TEMPORAL ARCHIVE COMPLETE! ★", 32);
             drawStatusMessage("You have successfully restored the timeline!", 36);
-        } else {
+        } else if (!exitRequested) {
             drawStatusMessage("✗ TEMPORAL ARCHIVE FAILED ✗", 31);
             drawStatusMessage("Another agent must attempt to restore history.", 33);
+        } else {
+            drawStatusMessage("✗ GAME EXITED ✗", 31);
+            drawStatusMessage("Timeline preservation aborted.", 33);
         }
         
         drawStatusMessage("Press any key to exit...", 37);
         getKey();
+    }
+    
+    /**
+     * @brief Check if exit was requested
+     * @return bool True if exit was requested
+     */
+    bool isExitRequested() const {
+        return exitRequested;
     }
 };
 
@@ -865,6 +890,9 @@ int runWordleApp() {
     int choice;
     cin >> choice;
     cin.ignore();
+    
+    // Clear input buffer
+    cin.clear();
     
     Difficulty diff;
     switch(choice) {
