@@ -33,7 +33,7 @@ public:
   ~WordPyramidGame();
 
   bool initialize(int difficultyChoice);
-  void runGameLoop();
+  bool runGameLoop();
   void clearPuzzle();
 
 private:
