@@ -90,7 +90,7 @@ Here is a highly detailed, standalone documentation file focused exclusively on 
 
 ***
 
-# Module Documentation: The Director's Archive (Celluloid App)
+# App 2: The Director's Archive 
 
 ## 1. Detailed Overview
 **The Director's Archive** is a cinematic, cryptography-style hangman game built into the Odyssey OS. Operating under the guise of recovering corrupted film reels, players act as cyber-archaeologists. The system presents a specific scene description from a famous movie (e.g., *“Giant alien robots fight in the Egyptian desert...”*). 
