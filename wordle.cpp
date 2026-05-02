@@ -34,36 +34,12 @@ using namespace chrono;
 // Constants and Enumerations
 // ================================
 
-/**
- * @enum Difficulty
- * @brief Game difficulty levels
- * 
- * EASY   - 30 seconds per guess, includes hints
- * MEDIUM - 20 seconds per guess, standard challenge
- * HARD   - 10 seconds per guess, expert mode, no hints
- */
 enum Difficulty { EASY, MEDIUM, HARD };
-
-/**
- * @enum CellState
- * @brief State of a cell in the Wordle grid
- * 
- * EMPTY      - No letter entered yet
- * CORRECT    - Letter is correct and in correct position (Green)
- * MISPLACED  - Letter is correct but wrong position (Yellow)
- * WRONG      - Letter is not in the target word (Gray)
- */
 enum CellState { EMPTY, CORRECT, MISPLACED, WRONG };
 
-/**
- * @struct Cell
- * @brief Represents a single cell in the game grid
- * 
- * Contains a character letter and its current state in the game
- */
 struct Cell {
-    char letter;      ///< The character entered by the player
-    CellState state;  ///< Current state of this cell
+    char letter;
+    CellState state;
 };
 
 // Word banks for different difficulty levels
@@ -78,41 +54,26 @@ const vector<string> MEDIUM_WORDS = {
 };
 
 const vector<string> HARD_WORDS = {
-    "ZIGG", "STELA", "LINTL", "OGIVE", "TRABE",
-    "DORIC", "IONIC", "CORIN", "CARYA", "ROSET"
+    "ZIGGURAT", "STELA", "LINTEL", "OGIVE", "TRABEATION",
+    "DORIC", "IONIC", "CORINTHIAN", "CARYATID", "ROSETTA"
 };
 
 // ================================
-// Console Color Class (Cross-platform)
+// Console Color Class
 // ================================
 
-/**
- * @class ConsoleColor
- * @brief Handles colored console output across Windows and Linux platforms
- * 
- * Uses ANSI escape codes on Linux and SetConsoleTextAttribute on Windows
- */
 class ConsoleColor {
 private:
 #ifdef _WIN32
-    HANDLE hConsole;  ///< Windows console handle
+    HANDLE hConsole;
 #endif
 public:
-    /**
-     * @brief Constructor - Initializes console handle on Windows
-     * @return None
-     */
     ConsoleColor() {
 #ifdef _WIN32
         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
     }
     
-    /**
-     * @brief Sets the text color for subsequent console output
-     * @param color Integer color code (ANSI color codes or Windows color values)
-     * @return None
-     */
     void setColor(int color) {
 #ifdef _WIN32
         SetConsoleTextAttribute(hConsole, color);
@@ -121,10 +82,6 @@ public:
 #endif
     }
     
-    /**
-     * @brief Resets console text color to default (white/gray)
-     * @return None
-     */
     void reset() {
 #ifdef _WIN32
         SetConsoleTextAttribute(hConsole, 7);
@@ -138,40 +95,21 @@ public:
 // Timer Class
 // ================================
 
-/**
- * @class Timer
- * @brief Timer class for tracking time-limited guesses
- * 
- * Uses high-resolution chrono for accurate timing
- */
 class Timer {
 private:
-    steady_clock::time_point startTime;  ///< Time when timer was started
-    int limit;                           ///< Time limit in seconds
-    bool running;                        ///< Whether timer is active
+    steady_clock::time_point startTime;
+    int limit;
+    bool running;
     
 public:
-    /**
-     * @brief Constructor - initializes timer to stopped state
-     * @return None
-     */
     Timer() : limit(0), running(false) {}
     
-    /**
-     * @brief Starts the timer with specified time limit
-     * @param seconds Time limit in seconds
-     * @return None
-     */
     void start(int seconds) {
         limit = seconds;
         startTime = steady_clock::now();
         running = true;
     }
     
-    /**
-     * @brief Gets remaining time on the timer
-     * @return int Number of seconds remaining (0 if expired)
-     */
     int getRemaining() {
         if (!running) return limit;
         auto now = steady_clock::now();
@@ -181,18 +119,10 @@ public:
         return remaining;
     }
     
-    /**
-     * @brief Checks if timer has expired
-     * @return bool True if time is up, false otherwise
-     */
     bool isExpired() {
         return getRemaining() <= 0;
     }
     
-    /**
-     * @brief Stops the timer (remains stopped until start() called again)
-     * @return None
-     */
     void stop() {
         running = false;
     }
@@ -202,28 +132,21 @@ public:
 // Game Class
 // ================================
 
-/**
- * @class TimeSlipSyndicate
- * @brief Main game class for The Time-Slip Syndicate
- * 
- * Handles game logic, UI rendering, and user input for the Wordle-style game
- */
 class TimeSlipSyndicate {
 private:
-    string targetWord;                    ///< The correct word to guess
-    vector<vector<Cell>> grid;            ///< 6x5 Wordle game grid
-    int currentRow;                       ///< Current row being filled (0-5)
-    bool gameWon;                         ///< Whether player has won
-    bool gameActive;                      ///< Whether game is still active
-    Difficulty difficulty;                ///< Selected difficulty level
-    string currentGuess;                  ///< Current guess being typed
-    Timer guessTimer;                     ///< Timer for current guess
-    int timeLimit;                        ///< Time limit based on difficulty
-    vector<string> wordBank;              ///< Words for selected difficulty
-    ConsoleColor console;                 ///< Console color handler
-    bool exitRequested;                   ///< Flag for exit request
+    string targetWord;
+    vector<vector<Cell>> grid;
+    int currentRow;
+    bool gameWon;
+    bool gameActive;
+    Difficulty difficulty;
+    string currentGuess;
+    Timer guessTimer;
+    int timeLimit;
+    vector<string> wordBank;
+    ConsoleColor console;
+    bool exitRequested;
     
-    // Immersive messages for feedback
     const vector<string> successMessages = {
         "Temporal fragment recovered!",
         "Historical resonance detected!",
@@ -239,14 +162,6 @@ private:
     };
     
 public:
-    /**
-     * @brief Constructor - Initializes game with selected difficulty
-     * @param diff Difficulty level (EASY/MEDIUM/HARD)
-     * @return None
-     * 
-     * Sets time limit, selects random target word from appropriate word bank,
-     * initializes empty grid, and starts the timer.
-     */
     TimeSlipSyndicate(Difficulty diff) : 
         currentRow(0), 
         gameWon(false), 
@@ -254,7 +169,6 @@ public:
         difficulty(diff),
         exitRequested(false) {
         
-        // Set time limit and word bank based on difficulty
         switch(difficulty) {
             case EASY:
                 timeLimit = 30;
@@ -270,59 +184,47 @@ public:
                 break;
         }
         
-        // Seed random number generator
         srand(time(nullptr));
-        
-        // Select random target word
         targetWord = wordBank[rand() % wordBank.size()];
         
-        // Initialize grid (6 rows x 5 columns)
+        // Make sure target word is exactly 5 letters for easy/medium
+        if (difficulty == HARD) {
+            // Filter HARD_WORDS to only 5-letter words
+            for (const auto& word : wordBank) {
+                if (word.length() == 5) {
+                    targetWord = word;
+                    break;
+                }
+            }
+        }
+        
         grid.resize(6, vector<Cell>(5));
         for (int i = 0; i < 6; ++i) {
             for (int j = 0; j < 5; ++j) {
-                grid[i][j].letter = '_';
+                grid[i][j].letter = ' ';
                 grid[i][j].state = EMPTY;
             }
         }
         
-        // Start the timer
         guessTimer.start(timeLimit);
     }
     
-    /**
-     * @brief Clears the console screen (cross-platform)
-     * @return None
-     * Uses ANSI escape codes on Linux, alternative on Windows
-     */
     void clearScreen() {
         cout << "\033[2J\033[1;1H";
     }
     
-    /**
-     * @brief Draws the top border of the game interface
-     * @return None
-     */
     void drawTopBorder() {
         console.setColor(36);
         cout << "╔════════════════════════════════════════════════════════════════════════════════╗\n";
         console.reset();
     }
     
-    /**
-     * @brief Draws the bottom border of the game interface
-     * @return None
-     */
     void drawBottomBorder() {
         console.setColor(36);
         cout << "╚════════════════════════════════════════════════════════════════════════════════╝\n";
         console.reset();
     }
     
-    /**
-     * @brief Draws the header with system status indicators
-     * @return None
-     * Displays [SCANNING], [ONLINE], [SECURE] with flickering scan line effect
-     */
     void drawHeader() {
         console.setColor(36);
         cout << "║  [TEMPORAL ARCHIVE v2.47]";
@@ -340,16 +242,11 @@ public:
         cout << "                                      ║\n";
         console.reset();
         
-        // Flickering scan line effect
         console.setColor(90);
         cout << "║  ⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡⌠⌡  ║\n";
         console.reset();
     }
     
-    /**
-     * @brief Draws side panels with era indicators (Classical/Medieval/Modern)
-     * @return None
-     */
     void drawSidePanels() {
         console.setColor(33);
         cout << "║  ┌─────────────┐                                                ║\n";
@@ -365,11 +262,6 @@ public:
         console.reset();
     }
     
-    /**
-     * @brief Draws the timer and attempt counter in the interface
-     * @return None
-     * Displays countdown timer with visual progress bar (█ for remaining, ░ for elapsed)
-     */
     void drawTimer() {
         int remaining = guessTimer.getRemaining();
         
@@ -377,7 +269,6 @@ public:
         console.setColor(remaining < 5 ? 31 : 33);
         cout << "[TIME: " << setw(2) << remaining << "s ";
         
-        // Progress bar
         int progress = (remaining * 10) / timeLimit;
         for (int i = 0; i < progress; ++i) cout << "█";
         for (int i = progress; i < 10; ++i) cout << "░";
@@ -385,33 +276,24 @@ public:
         
         console.reset();
         
-        // Show attempt counter
         console.setColor(36);
         cout << "  [ATTEMPT: " << currentRow + 1 << "/6]";
         console.reset();
         
-        // Show exit hint
         console.setColor(31);
-        cout << "  [Press ESC to EXIT]";
+        cout << "  [ESC to EXIT]";
         console.reset();
         
-        // Adjust spacing to align with right border
         int spaces = 69 - (15 + (remaining < 5 ? 0 : 0));
         for (int i = 0; i < spaces; ++i) cout << " ";
         cout << "║\n";
     }
     
-    /**
-     * @brief Draws the 6x5 Wordle game grid with color-coded cells
-     * @return None
-     * Grid layout changes based on difficulty (HARD uses compact layout)
-     */
     void drawWordleGrid() {
         for (int row = 0; row < 6; ++row) {
             cout << "║  ";
             
-            // Row highlighting for current attempt
-            if (row == currentRow && gameActive && !gameWon) {
+            if (row == currentRow && gameActive && !gameWon && !exitRequested) {
                 console.setColor(36);
                 cout << "▶";
                 console.reset();
@@ -421,7 +303,6 @@ public:
             }
             
             for (int col = 0; col < 5; ++col) {
-                // Set color based on cell state
                 switch(grid[row][col].state) {
                     case CORRECT:
                         console.setColor(32);
@@ -436,95 +317,18 @@ public:
                         console.setColor(37);
                 }
                 
-                // Draw cell based on difficulty
-                if (difficulty == HARD) {
-                    cout << " ";
-                    if (grid[row][col].state == EMPTY) {
-                        console.setColor(90);
-                        cout << "_";
-                    } else {
-                        cout << grid[row][col].letter;
-                    }
-                    cout << "  ";
-                } else if (difficulty == MEDIUM) {
-                    if (grid[row][col].state == EMPTY) {
-                        cout << "┌──┐ ";
-                    } else {
-                        cout << "┌──┐ ";
-                    }
-                } else {
-                    if (grid[row][col].state == EMPTY) {
-                        cout << "┌───┐ ";
-                    } else {
-                        cout << "┌───┐ ";
-                    }
-                }
+                cout << " " << (grid[row][col].letter == ' ' ? '_' : grid[row][col].letter) << "  ";
             }
             cout << "║\n";
-            
-            // Second line of cells
-            if (difficulty != HARD) {
-                cout << "║    ";
-                for (int col = 0; col < 5; ++col) {
-                    switch(grid[row][col].state) {
-                        case CORRECT:
-                            console.setColor(32);
-                            break;
-                        case MISPLACED:
-                            console.setColor(33);
-                            break;
-                        case WRONG:
-                            console.setColor(90);
-                            break;
-                        default:
-                            console.setColor(37);
-                    }
-                    
-                    if (difficulty == MEDIUM) {
-                        if (grid[row][col].state == EMPTY) {
-                            cout << "│__│ ";
-                        } else {
-                            cout << "│" << grid[row][col].letter 
-                                 << grid[row][col].letter << "│ ";
-                        }
-                    } else {
-                        if (grid[row][col].state == EMPTY) {
-                            cout << "│ " << grid[row][col].letter << " │ ";
-                        } else {
-                            cout << "│ " << grid[row][col].letter << " │ ";
-                        }
-                    }
-                }
-                cout << "║\n";
-                
-                // Third line of cells
-                cout << "║    ";
-                for (int col = 0; col < 5; ++col) {
-                    console.setColor(37);
-                    if (difficulty == MEDIUM) {
-                        cout << "└──┘ ";
-                    } else {
-                        cout << "└───┘ ";
-                    }
-                }
-                cout << "║\n";
-            }
-            
             console.reset();
         }
     }
     
-    /**
-     * @brief Draws the input area where player types their guess
-     * @return None
-     * Shows current typed letters, hints based on difficulty level
-     */
     void drawInputArea() {
         console.setColor(36);
         cout << "║  ┌────────────────────────────────────────────────────────────────────┐  ║\n";
         cout << "║  │ [GUESS: ";
         
-        // Show current typing
         for (size_t i = 0; i < currentGuess.length(); ++i) {
             console.setColor(37);
             cout << currentGuess[i];
@@ -538,19 +342,14 @@ public:
         console.setColor(36);
         cout << "]";
         
-        // Show hint based on difficulty and progress
         if (difficulty == EASY && currentRow == 2 && !gameWon) {
             console.setColor(33);
-            cout << "  [HINT: Common letters: R,U,I,N,S]";
-        } else if (difficulty == MEDIUM && currentRow == 3 && !gameWon) {
-            console.setColor(33);
-            cout << "  [HINT: Position 2 contains consonant]";
+            cout << "  [HINT: Common letters in historical terms]";
         } else {
             console.setColor(90);
-            cout << "  [Enter 5-letter word and press ENTER]";
+            cout << "  [Enter 5-letter word, ENTER to submit]";
         }
         
-        // Fill remaining space
         int spaces = 70 - (15 + (int)currentGuess.length() * 2);
         for (int i = 0; i < spaces; ++i) cout << " ";
         
@@ -560,29 +359,16 @@ public:
         console.reset();
     }
     
-    /**
-     * @brief Draws a status message in the game interface
-     * @param message The text to display
-     * @param color The color code for the message
-     * @return None
-     */
     void drawStatusMessage(const string& message, int color) {
         console.setColor(color);
         cout << "║  ";
         cout << message;
-        // Fill remaining space
         int spaces = 76 - (int)message.length();
         for (int i = 0; i < spaces; ++i) cout << " ";
         cout << "║\n";
         console.reset();
     }
     
-    /**
-     * @brief Draws the complete game interface
-     * @param statusMsg Optional status message to display (default: empty)
-     * @param statusColor Color for the status message (default: 37 - white)
-     * @return None
-     */
     void drawInterface(const string& statusMsg = "", int statusColor = 37) {
         clearScreen();
         drawTopBorder();
@@ -590,14 +376,12 @@ public:
         drawSidePanels();
         drawTimer();
         
-        // Draw separator
         console.setColor(36);
         cout << "║  ┌────────────────────────────────────────────────────────────────────┐  ║\n";
         console.reset();
         
         drawWordleGrid();
         
-        // Draw separator
         console.setColor(36);
         cout << "║  └────────────────────────────────────────────────────────────────────┘  ║\n";
         console.reset();
@@ -611,15 +395,6 @@ public:
         drawBottomBorder();
     }
     
-    /**
-     * @brief Evaluates the player's guess against the target word
-     * @return bool True if the guess was correct (win condition), false otherwise
-     * 
-     * Implements Wordle logic:
-     * - Green: Correct letter, correct position
-     * - Yellow: Correct letter, wrong position
-     * - Gray: Letter not in word
-     */
     bool evaluateGuess() {
         if (currentGuess.length() != 5) {
             drawInterface("INCOMPLETE TEMPORAL DATA - Need 5 letters!", 33);
@@ -627,12 +402,10 @@ public:
             return false;
         }
         
-        // Convert to uppercase
         for (char& c : currentGuess) {
             c = toupper(c);
         }
         
-        // Check win condition
         if (currentGuess == targetWord) {
             for (int i = 0; i < 5; ++i) {
                 grid[currentRow][i].letter = currentGuess[i];
@@ -647,13 +420,11 @@ public:
             return true;
         }
         
-        // Count letters in target
         map<char, int> targetCount;
         for (char c : targetWord) {
             targetCount[c]++;
         }
         
-        // First pass: mark correct positions
         for (int i = 0; i < 5; ++i) {
             if (currentGuess[i] == targetWord[i]) {
                 grid[currentRow][i].letter = currentGuess[i];
@@ -662,7 +433,6 @@ public:
             }
         }
         
-        // Second pass: mark misplaced letters
         for (int i = 0; i < 5; ++i) {
             if (grid[currentRow][i].state != CORRECT) {
                 if (targetCount[currentGuess[i]] > 0) {
@@ -694,12 +464,6 @@ public:
         return false;
     }
     
-    /**
-     * @brief Gets a single character from keyboard input without requiring Enter
-     * @return char The key pressed by the user
-     * 
-     * Cross-platform implementation using _getch() on Windows and termios on Linux
-     */
     char getKey() {
 #ifdef _WIN32
         return _getch();
@@ -716,10 +480,6 @@ public:
 #endif
     }
     
-    /**
-     * @brief Checks if a key is available to read without blocking
-     * @return bool True if a key is in the input buffer, false otherwise
-     */
     bool keyAvailable() {
 #ifdef _WIN32
         return _kbhit();
@@ -743,25 +503,13 @@ public:
 #endif
     }
     
-    /**
-     * @brief Main game loop that runs the game until win/loss
-     * @return None
-     * 
-     * Handles:
-     * - Timer checking and expiration
-     * - Keyboard input processing
-     * - Game state updates
-     * - Display updates
-     */
     void run() {
         drawInterface("Welcome, Time Agent. Decode the historical fragment.", 36);
         this_thread::sleep_for(chrono::milliseconds(2000));
         
-        // Main game loop
         while (gameActive && !gameWon && currentRow < 6 && !exitRequested) {
             drawInterface();
             
-            // Check timer expiration
             if (guessTimer.isExpired()) {
                 drawInterface("⚠ TIME PARADOX! Guess expired! ⚠", 31);
                 this_thread::sleep_for(chrono::milliseconds(1500));
@@ -783,11 +531,9 @@ public:
                 continue;
             }
             
-            // Handle input
             if (keyAvailable() && gameActive && !gameWon) {
                 char key = getKey();
                 
-                // Check for ESC key (ASCII 27) to exit
                 if (key == 27) { // ESC key
                     exitRequested = true;
                     drawInterface("EXITING GAME...", 31);
@@ -812,14 +558,13 @@ public:
             this_thread::sleep_for(chrono::milliseconds(50));
         }
         
-        // Game over message
         drawInterface();
         if (gameWon && !exitRequested) {
             drawStatusMessage("★ TEMPORAL ARCHIVE COMPLETE! ★", 32);
             drawStatusMessage("You have successfully restored the timeline!", 36);
         } else if (!exitRequested) {
             drawStatusMessage("✗ TEMPORAL ARCHIVE FAILED ✗", 31);
-            drawStatusMessage("Another agent must attempt to restore history.", 33);
+            drawStatusMessage("The historical fragment was: " + targetWord, 33);
         } else {
             drawStatusMessage("✗ GAME EXITED ✗", 31);
             drawStatusMessage("Timeline preservation aborted.", 33);
@@ -828,33 +573,12 @@ public:
         drawStatusMessage("Press any key to exit...", 37);
         getKey();
     }
-    
-    /**
-     * @brief Check if exit was requested
-     * @return bool True if exit was requested
-     */
-    bool isExitRequested() const {
-        return exitRequested;
-    }
 };
 
-// ================================
-// Main Function
-// ================================
-
-/**
- * @brief Main entry point for the Time-Slip Syndicate game
- * @return int Returns 0 on successful execution
- * 
- * Displays welcome screen, gets difficulty choice, and starts the game.
- * This function is called runWordleApp() to integrate with the main menu.
- */
 int runWordleApp() {
-    // Setup console
     cout << "\033[2J\033[1;1H";
     cout << "\n\n\n";
     
-    // Welcome screen
     ConsoleColor console;
     console.setColor(36);
     cout << "   ╔══════════════════════════════════════════════════════════════════════╗\n";
@@ -890,8 +614,6 @@ int runWordleApp() {
     int choice;
     cin >> choice;
     cin.ignore();
-    
-    // Clear input buffer
     cin.clear();
     
     Difficulty diff;
@@ -906,4 +628,8 @@ int runWordleApp() {
     game.run();
     
     return 0;
+}
+
+int main() {
+    return runWordleApp();
 }
