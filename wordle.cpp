@@ -15,19 +15,19 @@ using namespace std;
 
 enum Difficulty { EASY, MEDIUM, HARD };
 
-// Word banks
+// Word banks - ALL WORDS MUST BE EXACTLY 5 LETTERS
 const vector<string> EASY_WORDS = {
-    "RUINS", "MAYA", "ARCH", "DOME", "WALL", 
-    "TOWER", "TEMPLE", "STONE", "BRICK", "PILLAR"
+    "RUINS", "DOMES", "WALLS", "TOWER", "STONE", 
+    "BRICK", "GATES", "FORTS", "ABBEY", "MANOR"
 };
 
 const vector<string> MEDIUM_WORDS = {
     "TOMBS", "AZTEC", "STOAS", "PYLON", "OBELI",
-    "MAYAN", "INCA", "FORUM", "COLUMN", "VAULT"
+    "MAYAN", "INCAS", "FORUM", "PIERS", "VAULT"
 };
 
 const vector<string> HARD_WORDS = {
-    "ZIGG", "STELA", "LINTL", "OGIVE", "TRABE",
+    "STUPA", "STELA", "LINTL", "OGIVE", "TRABE",
     "DORIC", "IONIC", "CORIN", "CARYA", "ROSET"
 };
 
