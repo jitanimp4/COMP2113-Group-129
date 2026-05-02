@@ -209,7 +209,7 @@ A terminal-based crossword puzzle game where players solve clues to uncover word
 
 
 
-##### App 5: The Forger's Table
+App 5: The Forger's Table
 **Theme:** Heritage Crimes Investigation  
 **Developer:** Anshika Mittal
 
