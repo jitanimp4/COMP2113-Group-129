@@ -97,47 +97,65 @@ A terminal-based word pyramid puzzle where letters are arranged in a triangular 
 ## App 3: The Time-Slip Syndicate
 
 ### Theme
-Architecture & History - A Wordle-style game where players decode 5-letter historical and architectural terms.
+Architecture & History - A Wordle-style game where players decode 5-letter historical and architectural terms in a race against time.
 
 ### Core Gameplay
 - 6 attempts to guess a 5-letter historical/architectural word
-- Color-coded feedback: [Letter] = correct position, (Letter) = wrong position, {Letter} = not in word
+- Color-coded feedback system
 - 6x5 grid with persistent guess history
-- Timer system that limits each guess
+- Timer system that limits each guess based on difficulty
+- Hint system available in Easy mode
 
 ### Difficulty Levels
 
-| Difficulty | Time Limit | Word Bank | Hints |
-|------------|------------|-----------|-------|
-| EASY | 30s | 10 common words (RUINS, MAYA, ARCH, etc.) | Yes (after 3 guesses) |
-| MEDIUM | 20s | 10 mixed words (TOMBS, AZTEC, PYLON, etc.) | No |
-| HARD | 10s | 10 obscure terms (ZIGG, STELA, OGIVE, etc.) | No |
+| Difficulty | Time Limit | Word Bank Size | Hints |
+|------------|------------|----------------|-------|
+| **EASY** | 30 seconds | 10 common words | Yes (after 3 guesses) |
+| **MEDIUM** | 20 seconds | 10 mixed words | No |
+| **HARD** | 10 seconds | 10 obscure terms | No |
+
+### Word Banks by Difficulty
+
+**EASY Mode Words:** RUINS, MAYA, ARCH, DOME, WALL, TOWER, TEMPLE, STONE, BRICK, PILLAR
+
+**MEDIUM Mode Words:** TOMBS, AZTEC, STOAS, PYLON, OBELI, MAYAN, INCA, FORUM, COLUMN, VAULT
+
+**HARD Mode Words:** ZIGG, STELA, LINTL, OGIVE, TRABE, DORIC, IONIC, CORIN, CARYA, ROSET
 
 ### Controls
-- Type any 5-letter word
-- Press **ENTER** to submit your guess
-- Type **'exit'** or **'quit'** to exit the game at any time
+
+| Action | Input |
+|--------|-------|
+| Type your guess | Any 5 letters A-Z |
+| Submit guess | `ENTER` |
+| Exit game | Type `exit` or `quit` |
 
 ### Visual Feedback Guide
 
-| Display | Meaning |
-|---------|---------|
-| `[R]` | GREEN - Correct letter, right position |
-| `(U)` | YELLOW - Correct letter, wrong position |
-| `{N}` | GRAY - Letter not in the word |
-| `_` | Empty cell (not yet guessed) |
+After each guess, the game shows visual indicators for each letter:
+
+| Symbol | Meaning | What To Do |
+|--------|---------|-------------|
+| `[R]` | **GREEN** - Correct letter, right position | Keep this letter in this position |
+| `(U)` | **YELLOW** - Correct letter, wrong position | Use this letter elsewhere in your next guess |
+| `{N}` | **GRAY** - Letter not in the word | Don't use this letter again |
+| `_` | Empty cell (not yet guessed) | Fill with your next guess |
 
 ### How to Play
-1. Select difficulty from main menu (1-3)
-2. Type a 5-letter word and press ENTER
-3. Look at the feedback symbols:
-   - `[Letter]` = Keep it there!
-   - `(Letter)` = Move it somewhere else
-   - `{Letter}` = Don't use it again
-4. Use the hints in EASY mode after 3 wrong guesses
-5. Win by guessing correctly within 6 attempts
 
-### Example Gameplay
+1. **Start the Game:** Run the program and select difficulty from the main menu (1-3)
+2. **View Instructions:** Press 4 from main menu to see detailed instructions
+3. **Make a Guess:** Type any 5-letter word and press `ENTER`
+4. **Analyze Feedback:** Look at the symbols to see which letters are correct:
+   - `[Letter]` = Perfect! Keep it there
+   - `(Letter)` = Good letter, wrong spot - try moving it
+   - `{Letter}` = Wrong letter - avoid using it again
+5. **Use Hints (Easy Mode Only):** After 3 wrong guesses, the game reveals all letters in the target word
+6. **Beat the Timer:** Each guess has a time limit - if time expires, you lose that attempt
+7. **Win or Lose:** 
+   - **WIN** by guessing the word within 6 attempts
+   - **LOSE** if you use all 6 attempts or run out of time
+
 
 
 ## App 4: Crossword
