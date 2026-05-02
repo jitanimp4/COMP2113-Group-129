@@ -362,19 +362,7 @@ HARD_FORGE:   DATE=100-120 AD | LOCATION=Naples, Italy | STYLE=Byzantine
 ```
 
 
-
-### App 6: The Curator's Cryptex
-Got it — your Cryptex section in the README is **way too light compared to everyone else’s**, so let’s upgrade it to match their level of detail and style.
-
-Below is a **complete, polished README section** just for your game. You can copy-paste this directly under:
-
-```
-## App 6: The Curator's Cryptex
-```
-
----
-
-# **App 6: The Curator’s Cryptex**
+# App 6: The Curator’s Cryptex
 
 ## **Overview**
 
