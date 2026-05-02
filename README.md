@@ -86,14 +86,76 @@ A terminal-based word pyramid puzzle where letters are arranged in a triangular 
 8. Guess all hidden words to win and escape the pyramid
 9. Type `exit` to go back and change difficulty or quit
 
-### App 2: The Director's Archive
-**Theme:** Movies and Heritage Sites  
-**Game Mechanics:**
-- A Hollywood-style Hangman game where the player guesses letters based on famous movie quotes or scenes.
-- Each incorrect guess burns a frame of the film reel, decreasing the player’s lives.
-- Dynamic hints are provided as lives are lost.
-- Difficulty: Easy, Medium, Hard.
+Here is a highly detailed, standalone documentation file focused exclusively on **The Director's Archive** (the `CelluloidApp` module). This breaks down exactly how this specific minigame functions and how it fulfills your project's technical requirements. 
 
+***
+
+# Module Documentation: The Director's Archive (Celluloid App)
+
+## 1. Detailed Overview
+**The Director's Archive** is a cinematic, cryptography-style hangman game built into the Odyssey OS. Operating under the guise of recovering corrupted film reels, players act as cyber-archaeologists. The system presents a specific scene description from a famous movie (e.g., *“Giant alien robots fight in the Egyptian desert...”*). 
+
+The player must deduce and decrypt the real-world **Heritage Site** where the scene takes place (e.g., *PYRAMIDS OF GIZA*). The hidden location is displayed as a series of underscores (`_ _ _ _`), and the player must guess it letter by letter. Incorrect guesses "burn a frame of film" (lose a life) and trigger progressive hints about the location's history to guide the player toward the correct answer.
+
+---
+
+## 2. Coding Elements Implementation
+This module was specifically engineered to showcase all five core course requirements within a single application. 
+
+*   **1. Generation of Random Events:**
+    *   **Implementation:** The game utilizes the `<random>` and `<algorithm>` libraries to ensure replayability. Upon loading the database, `std::random_device` seeds a Mersenne Twister engine (`std::mt19937`), and `std::shuffle` randomizes the `siteDatabase` vector. 
+    *   **Purpose:** This guarantees that the player receives a completely random sequence of movie clues every time they launch the app, preventing predictable gameplay. If the player exhausts the entire deck, the system detects this and automatically reshuffles the archive.
+*   **2. Data Structures for Storing Data:**
+    *   **Implementation:** A custom C++ `struct` named `HeritageSite` is used to group the data. It contains `movieClue` (string), `answer` (string), and `hints` (a vector of strings). 
+    *   **Purpose:** This struct provides a clean blueprint for each puzzle. During runtime, a `std::vector<HeritageSite> siteDatabase` stores all loaded locations, acting as the primary data structure for the game deck.
+*   **3. Dynamic Memory Management:**
+    *   **Implementation:** Memory is managed dynamically on the heap via Standard Template Library (STL) containers. 
+    *   **Purpose:** Because each movie location in `movies.txt` has a variable number of hints (some have two, some have three), `std::vector<string> hints` safely and dynamically allocates the exact amount of heap memory required as it parses the file using `.push_back()`. Additionally, `std::string guessedState` dynamically resizes based on the character length of the hidden answer.
+*   **4. File Input/Output (I/O):**
+    *   **File Input:** The `loadFiles()` function uses `std::ifstream` to open and read `movies.txt`. It processes the text line by line, using a `std::stringstream` and `getline()` with a pipe character (`|`) delimiter to neatly separate the clue, answer, and hints into the data structure.
+    *   **Console I/O:** Standard `std::cin` and `std::cout` are used extensively. The game features robust input validation, ensuring the user only inputs a single alphabetical character (A-Z) and trapping them in a `while` loop with an error message if they type numbers or multiple letters.
+*   **5. Program Codes in Multiple Files:**
+    *   **Implementation:** The code is strictly compartmentalized. `celluloid_app.h` contains the class declarations, member variables, and struct definitions. `celluloid_app.cpp` contains the heavy logic and implementation. The app is then instantiated and executed from the central `main.cpp` file.
+
+---
+
+## 3. Difficulty Levels
+When launching The Director's Archive, the player is prompted to choose a security clearance level (1-3). This directly manipulates the internal state variables (`lives` and `hintsAllowed`), altering the risk/reward mechanics of the loop:
+
+*   **Level 1 (Easy):** 
+    *   **Lives:** 4 Frames 
+    *   **Hints Allowed:** 3 Hints
+    *   *Design:* Highly forgiving. Gives the player maximum contextual clues to figure out obscure heritage sites.
+*   **Level 2 (Medium):** 
+    *   **Lives:** 3 Frames
+    *   **Hints Allowed:** 2 Hints
+    *   *Design:* The standard experience. Requires a balance of movie knowledge and careful guessing.
+*   **Level 3 (Hard):** 
+    *   **Lives:** 2 Frames
+    *   **Hints Allowed:** 1 Hint
+    *   *Design:* Punishing. A single wrong guess triggers the only hint. A second wrong guess destroys the file. Players must rely heavily on their own trivia knowledge.
+
+---
+
+## 4. How to Play
+
+1.  **Launch:** Select Option 2 from the Odyssey OS Main Menu.
+2.  **Difficulty Selection:** Enter `1`, `2`, or `3` to set your parameters.
+3.  **The Clue:** The terminal will display a yellow text prompt detailing a famous movie scene (e.g., *"An aristocratic adventurer navigates through massive, ancient tree roots crushing the ruins of a jungle temple in Cambodia. (Movie: Lara Croft: Tomb Raider, 2001)"*).
+4.  **Decryption:** A target word made of underscores (`_ _ _ _ _`) will appear. 
+5.  **Input:** Type a single letter and press `ENTER`. 
+    *   If correct, the letter fills into the blank spaces.
+    *   If incorrect, a warning bell sounds (`\a`), a "Frame" (life) burns up, and a blue text hint about the location's real-world history is revealed.
+6.  **Loop:** You will be prompted to "Load another reel? (Y/N)" to play another random round until you decide to exit to the main menu.
+
+---
+
+## 5. Scoring System & Progression
+The Director's Archive does not use a numerical points system; it uses a **binary state progression**.
+
+*   **Victory State (`Match found!`):** If the player's `guessedState` string exactly matches the `hiddenAnswer` string before their `currentLives` counter reaches zero, the record is marked as `[DECRYPTED]`. 
+*   **Failure State (`[DATA LOST]`):** If `currentLives` hits `0`, the loop breaks, the film reel is "burned," and the correct answer is revealed to the player so they can learn from their mistake.
+*   **Meta-Progression:** Winning at least one round of The Director's Archive flips the `directorsArchiveDone` boolean in the main operating system to `true`. This is a mandatory prerequisite for bypassing the system lock and accessing the final boss game, The Curator's Cryptex.</HeritageSite>
 ## App 3: The Time-Slip Syndicate
 
 ### Theme
