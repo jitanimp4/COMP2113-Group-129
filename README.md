@@ -59,12 +59,37 @@ The player interacts with **Odyssey OS**, a system housing encrypted data of his
 - Difficulty: Easy, Medium, Hard.
 
 ### App 3: The Time-Slip Syndicate
-**Theme:** Architecture & History  
-**Game Mechanics:**
-- A Wordle-style game set in a terminal, where the player guesses 5-letter historical or architectural words and terminology.
-- Players must deduce the correct term through color-coded feedback (green, yellow, gray) to identify correct and incorrect letters.
-- Difficulty: Easy, Medium, Hard with a timer and era indicators.
-  
+**Developer:** Krislyn Mariah Mendonca
+### Theme
+Architecture & History - A Wordle-style game where players decode 5-letter historical and architectural terms.
+### Core Gameplay
+- 6 attempts to guess a 5-letter historical/architectural word
+- Color-coded feedback: Green (correct position), Yellow (wrong position), Gray (not in word)
+- 6x5 grid with persistent guess history
+### Difficulty Levels
+| Difficulty | Time Limit | Word Bank | Hints |
+|------------|------------|-----------|-------|
+| EASY | 30s | 10 common words (RUINS, MAYA, ARCH, etc.) | Yes |
+| MEDIUM | 20s | 10 mixed words (TOMBS, AZTEC, PYLON, etc.) | Limited |
+| HARD | 10s | 10 obscure terms (ZIGG, STELA, OGIVE, etc.) | None |
+### Special Features
+- Immersive terminal UI with era indicators (Classical/Medieval/Modern)
+- Real-time countdown timer with visual progress bar
+- ASCII art borders and flickering scan line effects
+- Thematic success/failure messages
+- ESC key to exit at any time
+### Controls
+- Type 5-letter word → Press `ENTER` to submit
+- `BACKSPACE` to delete → `ESC` to exit
+## Technologies Used
+- **C++11** for core game logic
+- **ASCII Art** for retro terminal aesthetic
+- **ANSI Escape Codes** for color (Linux/macOS)
+- **Windows Console API** for color (Windows)
+### Standard Libraries Used
+`<iostream>`, `<vector>`, `<map>`, `<chrono>`, `<thread>`, `<ctime>`, `<cctype>`, `<iomanip>`, `<termios.h>`, `<unistd.h>`, `<conio.h>`, `<windows.h>`
+### Non-Standard Libraries
+**None.** All libraries are standard C++ libraries requiring no additional installation.
 
 ### App 4: Crossword
 **Theme:** Wonders & Landmarks, Art Movements, Iconoclasts  
