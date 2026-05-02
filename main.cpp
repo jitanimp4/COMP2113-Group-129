@@ -10,6 +10,7 @@
 #include "celluloid_app.h"
 #include "word_pyramid.h"
 #include "game.h"
+#include "forgers_table.h"  // ADD THIS
 
 using namespace std;
 
@@ -32,12 +33,12 @@ string toLowerMain(string text)
 /*
  * Function: isCryptexUnlocked
  * What it does: Checks if all prerequisite games have been completed to unlock the final boss.
- * What the inputs are: bool game1Done, bool game2Done, bool game3Done (completion status flags)
+ * What the inputs are: bool game1Done, bool game2Done, bool game3Done, bool game4Done, bool game5Done (completion status flags)
  * What the outputs are: bool (true if all games are completed, false otherwise)
  */
-bool isCryptexUnlocked(bool game1Done, bool game2Done, bool game3Done)
+bool isCryptexUnlocked(bool game1Done, bool game2Done, bool game3Done, bool game4Done, bool game5Done)
 {
-    return game1Done && game2Done && game3Done;
+    return game1Done && game2Done && game3Done && game4Done && game5Done;
 }
 
 /*
@@ -70,6 +71,8 @@ int main()
     bool wordPyramidDone = false;
     bool directorsArchiveDone = false;
     bool timeSlipDone = false;
+    bool crosswordDone = false;      // ADD THIS
+    bool forgersTableDone = false;   // ADD THIS
 
     // Main application loop
     while (true)
@@ -82,11 +85,12 @@ int main()
         cout << "2. The Director's Archive\n";
         cout << "3. The Time-Slip Syndicate\n";
         cout << "4. Crossword\n";
+        cout << "5. The Forger's Table\n";   // ADD THIS
 
-        if (isCryptexUnlocked(wordPyramidDone, directorsArchiveDone, timeSlipDone))
-            cout << "5. The Curator's Cryptex\n";
+        if (isCryptexUnlocked(wordPyramidDone, directorsArchiveDone, timeSlipDone, crosswordDone, forgersTableDone))
+            cout << "6. The Curator's Cryptex\n";
         else
-            cout << "5. The Curator's Cryptex (LOCKED)\n";
+            cout << "6. The Curator's Cryptex (LOCKED)\n";
 
         cout << "0. Exit\n";
         cout << "Select App > ";
@@ -135,14 +139,21 @@ int main()
             // Note: Ensure "save_data.txt" handling meets the File I/O requirements in game.cpp.
             CrosswordGame game("save_data.txt");
             game.run();
+            crosswordDone = true;   // ADD THIS
             pauseMenu();
         }
-        else if (choice == 5)
+        else if (choice == 5)   // ADD THIS BLOCK
         {
-            if (!isCryptexUnlocked(wordPyramidDone, directorsArchiveDone, timeSlipDone))
+            runForgersTable();
+            forgersTableDone = true;
+            pauseMenu();
+        }
+        else if (choice == 6)
+        {
+            if (!isCryptexUnlocked(wordPyramidDone, directorsArchiveDone, timeSlipDone, crosswordDone, forgersTableDone))
             {
                 cout << "\nCRYPTEX LOCKED.\n";
-                cout << "Complete Word Pyramid, Director's Archive, and Time-Slip first.\n";
+                cout << "Complete Word Pyramid, Director's Archive, Time-Slip Syndicate, Crossword, and Forger's Table first.\n";
                 continue;
             }
 
