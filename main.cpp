@@ -52,9 +52,11 @@ void printBanner()
     cout << R"(
    ╔═══════════════════════════════════════════════════════════════╗
    ║                                                               ║
+   ║                                                               ║
+   ║                                                               ║
    ║                      O D Y S S E Y   O S                      ║
    ║                                                               ║
-   ║               The Forgery Authentication Unit                 ║
+   ║                                                               ║
    ║                                                               ║
    ╚═══════════════════════════════════════════════════════════════╝
    )" << '\n';
@@ -109,7 +111,7 @@ int main()
         
         cout << "\n";
         cout << "   " << BOLD << "┌─────────────────────────────────────────────────────┐" << RESET << endl;
-        cout << "   " << BOLD << "│                    MAIN MENU                         │" << RESET << endl;
+        cout << "   " << BOLD << "│                    MAIN MENU                         " << RESET << endl;
         cout << "   " << BOLD << "├─────────────────────────────────────────────────────┤" << RESET << endl;
         cout << "   │" << endl;
         
@@ -169,7 +171,7 @@ int main()
         if (choice == 0)
         {
             cout << "   " << RED << "👋 Logging off Odyssey OS..." << RESET << endl;
-            cout << "   " << CYAN << "Thank you for using the Forgery Authentication Unit!" << RESET << endl;
+            cout << "   " << CYAN << "Thank you for using the Odyssey App!" << RESET << endl;
             break;
         }
         else if (choice == 1)
