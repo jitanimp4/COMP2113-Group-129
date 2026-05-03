@@ -507,7 +507,7 @@ Certain questions grant:
 
 | Technology | Purpose |
 |------------|---------|
-| **C++17** | Main programming language |
+| **C++** | Main programming language |
 | **STL (Standard Template Library)** | Data structures (vector, list, map, set, string) |
 | **GCC/G++** | Compiler with `-std=c++17 -Wall -pthread` flags |
 | **Make** | Build automation |
