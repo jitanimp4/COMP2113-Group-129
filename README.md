@@ -7,7 +7,7 @@ Group Members:
 3. Krislyn Mariah Mendonca
 4. Anshika Mittal (3036476023)
 5. Arpita Sharma (3036476279)
-6. Miracle Ukazu Oluebube
+6. Miracle Ukazu Oluebube (3036566892)
 
 Contributions: 
 
