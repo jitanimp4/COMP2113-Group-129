@@ -42,7 +42,7 @@ bool WordPyramidGame::loadWordBank(const std::string& fileName, std::vector<std:
 //  Return value: true if words count in [4,7] and total chars in [40,60], else false.
 
 bool WordPyramidGame::validatePuzzleConstraints(const std::vector<std::string>& words) const {
-  if (words.size() < 4 || words.size() > 7) {
+  if (words.size() < 4 || words.size() > 6) {
     return false;
   }
 
@@ -50,7 +50,7 @@ bool WordPyramidGame::validatePuzzleConstraints(const std::vector<std::string>& 
   for (size_t i = 0; i < words.size(); ++i) {
     totalChars += static_cast<int>(words[i].size());
   }
-  return totalChars >= 40 && totalChars <= 60;
+  return totalChars >= 25 && totalChars <= 55;
 }
 
 //  Generates random puzzle sets from a loaded word bank while satisfying constraints.
