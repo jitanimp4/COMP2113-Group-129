@@ -521,7 +521,6 @@ Certain questions grant:
 | `<fstream>` | File I/O for save/load | game.cpp, forgers_table.cpp, cryptex_boss.cpp |
 | `<string>` | String manipulation | All files |
 | `<vector>` | Dynamic arrays | puzzle.cpp, wordle.cpp, cryptex_boss.cpp |
-| `<list>` | Linked list storage | (Student record system) |
 | `<map>` | Key-value pairs | puzzle.cpp, forgers_table.cpp |
 | `<set>` | Unique collections | puzzle.cpp |
 | `<algorithm>` | Sorting, searching | puzzle.cpp, forgers_table.cpp, wordle.cpp |
