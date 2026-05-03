@@ -2,7 +2,7 @@
 # Odyssey OS: The Heritage Terminal
 
 Group Members: 
-1. Menaka Kalpally Pulapra Menon
+1. Menaka Kalpally Pulapra Menon (3036505757)
 2. Anushka Jitani
 3. Krislyn Mariah Mendonca
 4. Anshika Mittal (3036476023)
