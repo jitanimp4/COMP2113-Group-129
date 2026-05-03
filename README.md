@@ -86,9 +86,6 @@ A terminal-based word pyramid puzzle where letters are arranged in a triangular 
 8. Guess all hidden words to win and escape the pyramid
 9. Type `exit` to go back and change difficulty or quit
 
-Here is a highly detailed, standalone documentation file focused exclusively on **The Director's Archive** (the `CelluloidApp` module). This breaks down exactly how this specific minigame functions and how it fulfills your project's technical requirements. 
-
-***
 
 # App 2: The Director's Archive 
 
@@ -156,6 +153,7 @@ The Director's Archive does not use a numerical points system; it uses a **binar
 *   **Victory State (`Match found!`):** If the player's `guessedState` string exactly matches the `hiddenAnswer` string before their `currentLives` counter reaches zero, the record is marked as `[DECRYPTED]`. 
 *   **Failure State (`[DATA LOST]`):** If `currentLives` hits `0`, the loop breaks, the film reel is "burned," and the correct answer is revealed to the player so they can learn from their mistake.
 *   **Meta-Progression:** Winning at least one round of The Director's Archive flips the `directorsArchiveDone` boolean in the main operating system to `true`. This is a mandatory prerequisite for bypassing the system lock and accessing the final boss game, The Curator's Cryptex.</HeritageSite>
+
 ## App 3: The Time-Slip Syndicate
 
 ### Theme
@@ -274,7 +272,6 @@ A terminal-based crossword puzzle game where players solve clues to uncover word
 ## **App 5: The Forger's Table**
 
 **Theme:** Heritage Crimes Investigation  
-**Developer:** Anshika Mittal
 
 ### Overview
 A terminal-based artifact authentication game. Two classified dossiers appear side by side — one genuine, one tampered by a forger. The player must identify which field(s) have been falsified. Across three difficulty levels the challenge escalates: labels disappear, multiple fields are forged simultaneously, a countdown timer is introduced, and some dossier pairs may be entirely authentic (requiring the player to call it out).
@@ -341,26 +338,6 @@ A terminal-based artifact authentication game. Two classified dossiers appear si
 8. Type `Q` at any prompt to return to the main menu immediately.
 
 ---
-
-### File Format — `forger_bank.txt`
-
-Each artifact block follows this structure (blocks separated by `===` or a blank line):
-
-```
-NAME: Colosseum
-DATE: 70-80 AD
-LOCATION: Rome, Italy
-BUILDER: Emperor Vespasian
-MATERIAL: Travertine limestone
-STYLE: Roman Imperial
-FACT: The Colosseum could hold up to 80,000 spectators.
-DIFFICULTY: easy
-EASY_FORGE:   DATE=100-120 AD
-MEDIUM_FORGE: BUILDER=Emperor Hadrian
-HARD_FORGE:   DATE=100-120 AD | LOCATION=Naples, Italy | STYLE=Byzantine
-===
-```
-
 
 # App 6: The Curator’s Cryptex
 
@@ -524,46 +501,61 @@ Certain questions grant:
    * Running out of time
 
 ---
+# Technologies Used 
 
-## **Game End Conditions**
+## Core Technologies
 
-### ✅ Victory:
+| Technology | Purpose |
+|------------|---------|
+| **C++17** | Main programming language |
+| **STL (Standard Template Library)** | Data structures (vector, list, map, set, string) |
+| **GCC/G++** | Compiler with `-std=c++17 -Wall -pthread` flags |
+| **Make** | Build automation |
+| **Git** | Version control |
 
-* Player answers all required questions with remaining lives
-* Curio celebrates and archive is restored
+## Libraries Used (All Standard)
 
-### ❌ Defeat:
+| Library | Purpose | Used In |
+|---------|---------|---------|
+| `<iostream>` | Input/output operations | All files |
+| `<fstream>` | File I/O for save/load | game.cpp, forgers_table.cpp, cryptex_boss.cpp |
+| `<string>` | String manipulation | All files |
+| `<vector>` | Dynamic arrays | puzzle.cpp, wordle.cpp, cryptex_boss.cpp |
+| `<list>` | Linked list storage | (Student record system) |
+| `<map>` | Key-value pairs | puzzle.cpp, forgers_table.cpp |
+| `<set>` | Unique collections | puzzle.cpp |
+| `<algorithm>` | Sorting, searching | puzzle.cpp, forgers_table.cpp, wordle.cpp |
+| `<cmath>` | Mathematical functions | puzzle.cpp |
+| `<cstdlib>` | Random number generation | All game files |
+| `<ctime>` | Time-based seeding | All game files |
+| `<chrono>` | Timing and animations | game.cpp, art.cpp, cryptex_boss.cpp |
+| `<thread>` | Background timer threads | forgers_table.cpp, cryptex_boss.cpp |
+| `<atomic>` | Thread-safe variables | forgers_table.cpp |
+| `<random>` | Modern random generation | puzzle.cpp, forgers_table.cpp |
+| `<iomanip>` | Formatted output | game.cpp, forgers_table.cpp |
+| `<sstream>` | String stream parsing | forgers_table.cpp, cryptex_boss.cpp |
+| `<cctype>` | Character checking | game.cpp, wordle.cpp |
+| `<limits>` | Input stream clearing | main.cpp |
 
-* Lives reach 0 **OR**
-* Time limit expires
+## ANSI Escape Sequences
 
----
+| Code | Effect | Used In |
+|------|--------|---------|
+| `\033[31m` | Red text | All files |
+| `\033[32m` | Green text | All files |
+| `\033[33m` | Yellow text | All files |
+| `\033[34m` | Blue text | All files |
+| `\033[35m` | Magenta text | All files |
+| `\033[36m` | Cyan text | All files |
+| `\033[1m` | Bold text | All files |
+| `\033[2m` | Dim text | main.cpp |
+| `\033[2J\033[1;1H` | Clear screen | main.cpp |
 
-## **Design Highlights**
+# Installation 
+How to run on linux server: 
 
-* Strong emphasis on **user experience** through animations and feedback
-* Robust **input handling system** for real-world typing behavior
-* Balanced **difficulty scaling** across modes
-* Modular and extensible code structure for adding new questions
-
----
-
-## **File Format — `cryptex_questions.txt`**
-
-Each question follows this structure:
-
-```
-difficulty|question|answer|hint
-```
-
-**Example:**
-
-```
-easy|What famous wall stretches across northern China?|Great Wall|It is visible from space (mythically)
-```
-
----
-
-## 🚀 Final Note
-
-The Curator’s Cryptex serves as the **culmination of all prior challenges**, combining knowledge, speed, and precision into a single high-stakes experience. It reinforces the central theme of *Odyssey OS*: preserving and understanding global heritage through interactive play.
+1. git clone https://github.com/jitanimp4/COMP2113-Group-129.git
+2. cd COMP2113-Group-129
+3. make clean
+4. make
+5. ./odyssey_os
