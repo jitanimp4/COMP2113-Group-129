@@ -156,23 +156,24 @@ The Director's Archive does not use a numerical points system; it uses a **binar
 
 ## App 3: The Time-Slip Syndicate
 
+**Developer:** Krislyn Mariah Mendonca
+
 ### Theme
-Architecture & History - A Wordle-style game where players decode 5-letter historical and architectural terms in a race against time.
+Architecture & History - A Wordle-style game where players decode 5-letter historical and architectural terms.
 
 ### Core Gameplay
 - 6 attempts to guess a 5-letter historical/architectural word
 - Color-coded feedback system
 - 6x5 grid with persistent guess history
-- Timer system that limits each guess based on difficulty
 - Hint system available in Easy mode
 
 ### Difficulty Levels
 
-| Difficulty | Time Limit | Word Bank Size | Hints |
-|------------|------------|----------------|-------|
-| **EASY** | 30 seconds | 10 common words | Yes (after 3 guesses) |
-| **MEDIUM** | 20 seconds | 10 mixed words | No |
-| **HARD** | 10 seconds | 10 obscure terms | No |
+| Difficulty | Word Bank Size | Hints |
+|------------|----------------|-------|
+| **EASY** | 10 common words | Yes (after 3 guesses) |
+| **MEDIUM** | 10 mixed words | No |
+| **HARD** | 10 obscure terms | No |
 
 ### Word Banks by Difficulty
 
@@ -211,10 +212,10 @@ After each guess, the game shows visual indicators for each letter:
    - `(Letter)` = Good letter, wrong spot - try moving it
    - `{Letter}` = Wrong letter - avoid using it again
 5. **Use Hints (Easy Mode Only):** After 3 wrong guesses, the game reveals all letters in the target word
-6. **Beat the Timer:** Each guess has a time limit - if time expires, you lose that attempt
-7. **Win or Lose:** 
+6. **Win or Lose:** 
    - **WIN** by guessing the word within 6 attempts
-   - **LOSE** if you use all 6 attempts or run out of time
+   - **LOSE** if you use all 6 attempts
+
 
 
 
