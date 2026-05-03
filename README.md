@@ -6,7 +6,7 @@ Group Members:
 2. Anushka Jitani
 3. Krislyn Mariah Mendonca
 4. Anshika Mittal (3036476023)
-5. Arpita Sharma
+5. Arpita Sharma (3036476279)
 6. Miracle Ukazu Oluebube
 
 Contributions: 
