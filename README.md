@@ -3,7 +3,7 @@
 
 Group Members: 
 1. Menaka Kalpally Pulapra Menon (3036505757)
-2. Anushka Jitani
+2. Anushka Jitani (3036474336)
 3. Krislyn Mariah Mendonca
 4. Anshika Mittal (3036476023)
 5. Arpita Sharma (3036476279)
